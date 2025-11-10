@@ -15,55 +15,139 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             color: #ffffff;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Animated background particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
         }
         
         .container {
             max-width: 500px;
             width: 100%;
             margin-top: 40px;
+            position: relative;
+            z-index: 1;
         }
         
         .header {
             text-align: center;
             margin-bottom: 40px;
+            animation: slideDown 0.8s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .logo {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             background: linear-gradient(135deg, #0088cc, #00aaff);
-            border-radius: 20px;
+            border-radius: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px;
-            font-size: 40px;
+            font-size: 50px;
+            box-shadow: 0 10px 30px rgba(0, 136, 204, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px rgba(0, 136, 204, 0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 15px 40px rgba(0, 136, 204, 0.5);
+            }
         }
         
         h1 {
-            font-size: 28px;
+            font-size: 32px;
             margin-bottom: 10px;
+            background: linear-gradient(135deg, #ffffff, #a0a0a0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .subtitle {
             color: #a0a0a0;
             font-size: 16px;
+            opacity: 0.9;
         }
         
         .card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 32px;
             margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .wallet-section {
@@ -71,50 +155,137 @@
         }
         
         .section-title {
-            font-size: 18px;
-            margin-bottom: 16px;
+            font-size: 20px;
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
+            font-weight: 600;
         }
         
         .section-title::before {
             content: '';
             display: inline-block;
             width: 4px;
-            height: 20px;
-            background: #0088cc;
-            margin-right: 10px;
+            height: 24px;
+            background: linear-gradient(135deg, #0088cc, #00aaff);
+            margin-right: 12px;
             border-radius: 2px;
         }
         
         .wallet-info {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            display: none;
+            border: 1px solid rgba(0, 136, 204, 0.3);
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .wallet-address-container {
+            background: rgba(0, 136, 204, 0.1);
             border-radius: 12px;
             padding: 16px;
-            margin-bottom: 16px;
-            display: none;
+            margin-bottom: 20px;
+            border: 1px solid rgba(0, 136, 204, 0.2);
+            position: relative;
+            overflow: hidden;
         }
         
         .wallet-address {
-            font-family: monospace;
+            font-family: 'Courier New', monospace;
             word-break: break-all;
             color: #00aaff;
-            margin-bottom: 16px;
             font-size: 14px;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .wallet-address::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 170, 255, 0.2), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
         }
         
         .wallet-actions {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .status-badge {
+            background: linear-gradient(135deg, #28a745, #34ce57);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            animation: glow 2s infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(40, 167, 69, 0.8);
+            }
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: blink 1.5s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
         }
         
         .connect-button {
             background: linear-gradient(135deg, #0088cc, #00aaff);
             color: white;
             border: none;
-            border-radius: 12px;
-            padding: 16px;
+            border-radius: 16px;
+            padding: 18px 32px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
@@ -123,15 +294,32 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .connect-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .connect-button:hover::before {
+            left: 100%;
         }
         
         .connect-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 136, 204, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 136, 204, 0.4);
         }
         
         .connect-button:active {
-            transform: translateY(0);
+            transform: translateY(-1px);
         }
         
         .disconnect-button {
@@ -139,7 +327,7 @@
             color: white;
             border: none;
             border-radius: 12px;
-            padding: 12px 20px;
+            padding: 12px 24px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -147,6 +335,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .disconnect-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .disconnect-button:hover::before {
+            left: 100%;
         }
         
         .disconnect-button:hover {
@@ -155,16 +360,17 @@
         }
         
         .button-icon {
-            width: 20px;
-            height: 20px;
-            margin-right: 8px;
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            filter: brightness(0) invert(1);
         }
         
         .notification {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 16px 24px;
+            padding: 18px 24px;
             border-radius: 12px;
             color: white;
             font-weight: 500;
@@ -172,6 +378,7 @@
             transition: transform 0.3s ease;
             z-index: 1000;
             max-width: 300px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
         
         .notification.success {
@@ -188,6 +395,16 @@
         
         .notification.show {
             transform: translateX(0);
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(120%);
+            }
+            to {
+                transform: translateX(0);
+            }
         }
         
         .footer {
@@ -195,6 +412,17 @@
             text-align: center;
             color: #a0a0a0;
             font-size: 14px;
+            opacity: 0.8;
+            animation: fadeIn 1s ease-out 0.6s both;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 0.8;
+            }
         }
         
         .loading {
@@ -215,27 +443,70 @@
         .error-message {
             background: rgba(220, 53, 69, 0.2);
             border: 1px solid rgba(220, 53, 69, 0.3);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 16px;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
             font-size: 14px;
             color: #ff6b6b;
             display: none;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
         }
         
         .airdrop-info {
-            background: rgba(23, 162, 184, 0.2);
+            background: linear-gradient(135deg, rgba(23, 162, 184, 0.2), rgba(32, 201, 151, 0.2));
             border: 1px solid rgba(23, 162, 184, 0.3);
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 20px;
-            font-size: 14px;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 24px;
+            font-size: 15px;
             color: #17a2b8;
             text-align: center;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+        
+        .airdrop-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .copy-button {
+            background: rgba(0, 136, 204, 0.2);
+            border: 1px solid rgba(0, 136, 204, 0.3);
+            color: #00aaff;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .copy-button:hover {
+            background: rgba(0, 136, 204, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .copy-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+            filter: brightness(0) invert(1);
         }
     </style>
 </head>
 <body>
+    <!-- Animated background particles -->
+    <div class="particles" id="particles"></div>
+    
     <div class="container">
         <div class="header">
             <div class="logo">₮</div>
@@ -250,9 +521,18 @@
                 <h2 class="section-title">Wallet Connection</h2>
                 
                 <div class="wallet-info" id="walletInfo">
-                    <div class="wallet-address" id="walletAddress"></div>
+                    <div class="wallet-address-container">
+                        <div class="wallet-address" id="walletAddress"></div>
+                        <button class="copy-button" onclick="copyAddress()">
+                            <img src="https://cdn-icons-png.flaticon.com/512/660/660620.png" alt="Copy" class="copy-icon">
+                            Copy Address
+                        </button>
+                    </div>
                     <div class="wallet-actions">
-                        <span style="color: #a0a0a0; font-size: 14px;">Connected for airdrop eligibility</span>
+                        <div class="status-badge">
+                            <span class="status-dot"></span>
+                            Connected for Airdrop
+                        </div>
                         <button class="disconnect-button" id="disconnectButton">
                             <img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="Disconnect" class="button-icon">
                             Disconnect
@@ -267,6 +547,7 @@
             </div>
             
             <div class="airdrop-info">
+                <span class="airdrop-icon">🎁</span>
                 Connect your wallet to be eligible for future airdrops. Your wallet address will be stored securely.
             </div>
         </div>
@@ -279,12 +560,29 @@
     <div class="notification" id="notification"></div>
     
     <script>
+        // Create animated particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (Math.random() * 20 + 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        createParticles();
+        
         // Initialize Telegram WebApp
         if (window.Telegram && window.Telegram.WebApp) {
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
-            window.Telegram.WebApp.setBackgroundColor('#1a1a2e');
-            window.Telegram.WebApp.setHeaderColor('#1a1a2e');
+            window.Telegram.WebApp.setBackgroundColor('#0f0c29');
+            window.Telegram.WebApp.setHeaderColor('#0f0c29');
         }
         
         // DOM elements
@@ -355,21 +653,25 @@
             
             // Connect wallet button click handler
             connectButton.addEventListener('click', async () => {
+                connectButton.innerHTML = '<span class="loading"></span> Connecting...';
                 try {
                     await tonConnectUI.connectWallet();
                 } catch (error) {
                     console.error('Connection error:', error);
                     showNotification('Failed to connect wallet. Please try again.', 'error');
+                    connectButton.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/1791/1791330.png" alt="Connect" class="button-icon"> Connect TON Wallet';
                 }
             });
             
             // Disconnect wallet button click handler
             disconnectButton.addEventListener('click', async () => {
+                disconnectButton.innerHTML = '<span class="loading"></span> Disconnecting...';
                 try {
                     await tonConnectUI.disconnect();
                 } catch (error) {
                     console.error('Disconnection error:', error);
                     showNotification('Failed to disconnect wallet. Please try again.', 'error');
+                    disconnectButton.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="Disconnect" class="button-icon"> Disconnect';
                 }
             });
         }
@@ -391,11 +693,22 @@
                 
                 // Show connect button
                 connectButton.style.display = 'flex';
+                connectButton.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/1791/1791330.png" alt="Connect" class="button-icon"> Connect TON Wallet';
                 
                 if (address === '') {
                     showNotification('Wallet disconnected', 'info');
                 }
             }
+        }
+        
+        // Copy wallet address to clipboard
+        function copyAddress() {
+            const address = walletAddress.textContent;
+            navigator.clipboard.writeText(address).then(() => {
+                showNotification('Address copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Failed to copy address', 'error');
+            });
         }
         
         // Show notification
