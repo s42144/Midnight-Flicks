@@ -4,290 +4,429 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TON Payment Gateway</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-    <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
-        .glass-effect {
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+            margin-top: 40px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #0088cc, #00aaff);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 16px;
+        }
+        
+        .card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .ton-button {
-            background: linear-gradient(90deg, #0088cc, #00aaff);
+        
+        .wallet-section {
+            margin-bottom: 24px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background: #0088cc;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+        
+        .wallet-info {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        
+        .wallet-address {
+            font-family: monospace;
+            word-break: break-all;
+            color: #00aaff;
+            margin-bottom: 8px;
+        }
+        
+        .balance {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .balance-currency {
+            font-size: 16px;
+            color: #a0a0a0;
+        }
+        
+        .connect-button {
+            background: linear-gradient(135deg, #0088cc, #00aaff);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .ton-button:hover {
+        
+        .connect-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(0, 136, 204, 0.3);
         }
+        
+        .connect-button:active {
+            transform: translateY(0);
+        }
+        
+        .connect-button.connected {
+            background: linear-gradient(135deg, #28a745, #34ce57);
+        }
+        
+        .payment-section {
+            margin-top: 24px;
+        }
+        
+        .amount-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .amount-input:focus {
+            outline: none;
+            border-color: #0088cc;
+        }
+        
+        .payment-button {
+            background: linear-gradient(135deg, #28a745, #34ce57);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .payment-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+        
+        .payment-button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
         .notification {
-            animation: slideIn 0.5s ease-out;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
         }
-        @keyframes slideIn {
-            from {
-                transform: translateY(-100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #28a745, #34ce57);
         }
-        .loader {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 3px solid white;
+        
+        .notification.error {
+            background: linear-gradient(135deg, #dc3545, #e4606d);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #a0a0a0;
+            font-size: 14px;
+        }
+        
+        .loading {
+            display: inline-block;
             width: 20px;
             height: 20px;
-            animation: spin 1s linear infinite;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
         }
+        
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .min-amount {
+            font-size: 14px;
+            color: #a0a0a0;
+            margin-top: 8px;
+        }
+        
+        .icon {
+            margin-right: 8px;
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
-    <div id="notification" class="fixed top-5 right-5 p-4 rounded-lg text-white hidden notification z-50"></div>
-    
-    <div class="glass-effect rounded-2xl p-8 max-w-md w-full shadow-2xl">
-        <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-500 rounded-full mb-4">
-                <i class="fab fa-telegram text-white text-2xl"></i>
-            </div>
-            <h1 class="text-3xl font-bold text-white mb-2">TON Payment Gateway</h1>
-            <p class="text-blue-100">Connect your TON wallet to make a payment</p>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">₮</div>
+            <h1>TON Payment Gateway</h1>
+            <p class="subtitle">Secure payments with TON blockchain</p>
         </div>
-
-        <div id="wallet-section" class="mb-6">
-            <div id="wallet-info" class="hidden mb-4 p-4 bg-blue-500 bg-opacity-20 rounded-lg">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-blue-100 text-sm">Connected Wallet</p>
-                        <p id="wallet-address" class="text-white font-medium"></p>
+        
+        <div class="card">
+            <div class="wallet-section">
+                <h2 class="section-title">Wallet Connection</h2>
+                <div class="wallet-info" id="walletInfo">
+                    <div class="wallet-address" id="walletAddress"></div>
+                    <div class="balance">
+                        <span id="balanceAmount">0</span>
+                        <span class="balance-currency">TON</span>
                     </div>
-                    <button id="disconnect-btn" class="text-red-300 hover:text-red-100 transition">
-                        <i class="fas fa-times-circle text-xl"></i>
-                    </button>
                 </div>
+                <button class="connect-button" id="connectButton">
+                    <span class="icon">🔗</span> Connect TON Wallet
+                </button>
             </div>
             
-            <div id="connect-section">
-                <button id="connect-wallet-btn" class="ton-button w-full py-3 px-4 rounded-lg text-white font-medium flex items-center justify-center">
-                    <i class="fab fa-telegram-plane mr-2"></i>
-                    Connect TON Wallet
+            <div class="payment-section">
+                <h2 class="section-title">Make a Payment</h2>
+                <input type="number" class="amount-input" id="amountInput" placeholder="Enter amount in TON" min="4" step="0.01">
+                <div class="min-amount">Minimum deposit: 4 TON</div>
+                <button class="payment-button" id="paymentButton" disabled>
+                    <span class="icon">💳</span> Send Payment
                 </button>
             </div>
         </div>
-
-        <div id="payment-section" class="hidden">
-            <div class="mb-6 p-4 bg-blue-500 bg-opacity-20 rounded-lg">
-                <div class="flex justify-between mb-2">
-                    <span class="text-blue-100">Minimum Deposit</span>
-                    <span class="text-white font-medium">4 TON</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-blue-100">Recipient</span>
-                    <span class="text-white font-medium text-sm">UQACiEaN0Qt2TjpxBdJ7XZateCvEPjdA7qf5bMo5uCPLbSoh</span>
-                </div>
-            </div>
-            
-            <div class="mb-4">
-                <label for="amount-input" class="block text-blue-100 mb-2">Amount (TON)</label>
-                <input id="amount-input" type="number" min="4" step="0.01" placeholder="Enter amount (min: 4 TON)" 
-                    class="w-full p-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-blue-200 border border-blue-300 border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
-            </div>
-            
-            <button id="pay-btn" class="ton-button w-full py-3 px-4 rounded-lg text-white font-medium flex items-center justify-center">
-                <i class="fas fa-paper-plane mr-2"></i>
-                Send Payment
-            </button>
-        </div>
-
-        <div id="status-section" class="hidden mt-6 p-4 rounded-lg text-center">
-            <div id="status-icon" class="mb-3"></div>
-            <p id="status-message" class="text-white font-medium"></p>
+        
+        <div class="footer">
+            <p>Powered by TON Connect</p>
         </div>
     </div>
-
+    
+    <div class="notification" id="notification"></div>
+    
     <script>
         // Initialize Telegram WebApp
-        const tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.ready();
-            tg.expand();
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
         }
-
+        
         // Initialize TonConnect
-        const tonConnectUI = new TonConnectUI({
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://midnight-flicks-adults.vercel.app/tonconnect-manifest.json',
             buttonRootId: null
         });
-
-        // DOM Elements
-        const connectWalletBtn = document.getElementById('connect-wallet-btn');
-        const disconnectBtn = document.getElementById('disconnect-btn');
-        const walletInfo = document.getElementById('wallet-info');
-        const walletAddress = document.getElementById('wallet-address');
-        const connectSection = document.getElementById('connect-section');
-        const paymentSection = document.getElementById('payment-section');
-        const payBtn = document.getElementById('pay-btn');
-        const amountInput = document.getElementById('amount-input');
-        const statusSection = document.getElementById('status-section');
-        const statusIcon = document.getElementById('status-icon');
-        const statusMessage = document.getElementById('status-message');
+        
+        // DOM elements
+        const connectButton = document.getElementById('connectButton');
+        const walletInfo = document.getElementById('walletInfo');
+        const walletAddress = document.getElementById('walletAddress');
+        const balanceAmount = document.getElementById('balanceAmount');
+        const amountInput = document.getElementById('amountInput');
+        const paymentButton = document.getElementById('paymentButton');
         const notification = document.getElementById('notification');
-
-        // Constants
-        const RECIPIENT_WALLET = 'UQACiEaN0Qt2TjpxBdJ7XZateCvEPjdA7qf5bMo5uCPLbSoh';
-        const MIN_DEPOSIT = 4;
-
+        
+        // User's wallet address
+        const userWalletAddress = 'UQACiEaN0Qt2TjpxBdJ7XZateCvEPjdA7qf5bMo5uCPLbSoh';
+        
         // Check if wallet was previously connected
         const savedWalletAddress = localStorage.getItem('tonWalletAddress');
         if (savedWalletAddress) {
-            showWalletConnected(savedWalletAddress);
+            updateWalletUI(true, savedWalletAddress);
         }
-
-        // Event Listeners
-        connectWalletBtn.addEventListener('click', connectWallet);
-        disconnectBtn.addEventListener('click', disconnectWallet);
-        payBtn.addEventListener('click', sendPayment);
-
-        // TonConnect event listeners
+        
+        // Listen for wallet connection status changes
         tonConnectUI.onStatusChange(wallet => {
             if (wallet) {
                 const address = wallet.account.address;
-                const formattedAddress = formatAddress(address);
+                updateWalletUI(true, address);
                 localStorage.setItem('tonWalletAddress', address);
-                showWalletConnected(formattedAddress);
+                getBalance(address);
             } else {
+                updateWalletUI(false);
                 localStorage.removeItem('tonWalletAddress');
-                showWalletDisconnected();
             }
         });
-
-        // Functions
-        async function connectWallet() {
-            try {
+        
+        // Connect wallet button click handler
+        connectButton.addEventListener('click', async () => {
+            if (tonConnectUI.connected) {
+                await tonConnectUI.disconnect();
+            } else {
                 await tonConnectUI.connectWallet();
-            } catch (error) {
-                showNotification('Failed to connect wallet', 'error');
-                console.error('Connection error:', error);
             }
-        }
-
-        function disconnectWallet() {
-            tonConnectUI.disconnect();
-        }
-
-        function showWalletConnected(address) {
-            walletAddress.textContent = address;
-            walletInfo.classList.remove('hidden');
-            connectSection.classList.add('hidden');
-            paymentSection.classList.remove('hidden');
-        }
-
-        function showWalletDisconnected() {
-            walletInfo.classList.add('hidden');
-            connectSection.classList.remove('hidden');
-            paymentSection.classList.add('hidden');
-        }
-
-        function formatAddress(address) {
-            if (!address) return '';
-            return `${address.slice(0, 6)}...${address.slice(-4)}`;
-        }
-
-        async function sendPayment() {
+        });
+        
+        // Payment button click handler
+        paymentButton.addEventListener('click', async () => {
             const amount = parseFloat(amountInput.value);
             
-            if (isNaN(amount) || amount < MIN_DEPOSIT) {
-                showNotification(`Minimum deposit is ${MIN_DEPOSIT} TON`, 'error');
+            if (isNaN(amount) || amount < 4) {
+                showNotification('Minimum deposit amount is 4 TON', 'error');
                 return;
             }
-
+            
             try {
-                showStatus('processing');
+                paymentButton.disabled = true;
+                paymentButton.innerHTML = '<span class="loading"></span> Processing...';
                 
-                // Convert TON to nanotons (1 TON = 1 billion nanotons)
-                const nanotons = Math.floor(amount * 1e9);
-                
+                // Create transaction
                 const transaction = {
                     messages: [
                         {
-                            address: RECIPIENT_WALLET,
-                            amount: nanotons.toString()
+                            address: userWalletAddress,
+                            amount: (amount * 1000000000).toString(), // Convert TON to nanotons
                         }
                     ]
                 };
-
-                const result = await tonConnectUI.sendTransaction(transaction);
                 
-                if (result) {
-                    showStatus('success');
-                    showNotification('Payment Successful', 'success');
-                    amountInput.value = '';
-                } else {
-                    showStatus('error');
-                    showNotification('Payment failed', 'error');
+                // Send transaction
+                await tonConnectUI.sendTransaction(transaction);
+                
+                // Show success message
+                showNotification('Payment Successful', 'success');
+                amountInput.value = '';
+                
+                // Update balance after successful payment
+                if (tonConnectUI.connected) {
+                    getBalance(tonConnectUI.wallet.account.address);
                 }
             } catch (error) {
-                showStatus('error');
-                showNotification('Transaction error: ' + error.message, 'error');
-                console.error('Transaction error:', error);
+                console.error('Payment error:', error);
+                showNotification('Payment failed. Please try again.', 'error');
+            } finally {
+                paymentButton.disabled = false;
+                paymentButton.innerHTML = '<span class="icon">💳</span> Send Payment';
+            }
+        });
+        
+        // Update wallet UI based on connection status
+        function updateWalletUI(connected, address = '') {
+            if (connected) {
+                connectButton.classList.add('connected');
+                connectButton.innerHTML = '<span class="icon">🔗</span> Disconnect Wallet';
+                walletInfo.style.display = 'block';
+                walletAddress.textContent = address;
+                paymentButton.disabled = false;
+            } else {
+                connectButton.classList.remove('connected');
+                connectButton.innerHTML = '<span class="icon">🔗</span> Connect TON Wallet';
+                walletInfo.style.display = 'none';
+                paymentButton.disabled = true;
             }
         }
-
-        function showStatus(type) {
-            statusSection.classList.remove('hidden');
-            
-            if (type === 'processing') {
-                statusIcon.innerHTML = '<div class="loader mx-auto"></div>';
-                statusMessage.textContent = 'Processing payment...';
-                statusSection.className = 'mt-6 p-4 rounded-lg text-center bg-blue-500 bg-opacity-20';
-                payBtn.disabled = true;
-                payBtn.innerHTML = '<div class="loader mx-auto"></div>';
-            } else if (type === 'success') {
-                statusIcon.innerHTML = '<i class="fas fa-check-circle text-green-400 text-3xl"></i>';
-                statusMessage.textContent = 'Payment Successful';
-                statusSection.className = 'mt-6 p-4 rounded-lg text-center bg-green-500 bg-opacity-20';
-                payBtn.disabled = false;
-                payBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send Payment';
-            } else if (type === 'error') {
-                statusIcon.innerHTML = '<i class="fas fa-exclamation-circle text-red-400 text-3xl"></i>';
-                statusMessage.textContent = 'Payment Failed';
-                statusSection.className = 'mt-6 p-4 rounded-lg text-center bg-red-500 bg-opacity-20';
-                payBtn.disabled = false;
-                payBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send Payment';
-            }
-            
-            // Hide status after 5 seconds for success or error
-            if (type === 'success' || type === 'error') {
-                setTimeout(() => {
-                    statusSection.classList.add('hidden');
-                }, 5000);
+        
+        // Get wallet balance
+        async function getBalance(address) {
+            try {
+                // For demo purposes, we'll use a mock balance
+                // In a real app, you would fetch the actual balance from the TON API
+                balanceAmount.textContent = (Math.random() * 10 + 1).toFixed(2);
+            } catch (error) {
+                console.error('Error fetching balance:', error);
+                balanceAmount.textContent = '0';
             }
         }
-
+        
+        // Show notification
         function showNotification(message, type) {
             notification.textContent = message;
-            notification.classList.remove('hidden');
-            
-            if (type === 'success') {
-                notification.className = 'fixed top-5 right-5 p-4 rounded-lg text-white notification z-50 bg-green-500';
-            } else if (type === 'error') {
-                notification.className = 'fixed top-5 right-5 p-4 rounded-lg text-white notification z-50 bg-red-500';
-            }
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
             
             setTimeout(() => {
-                notification.classList.add('hidden');
+                notification.classList.remove('show');
             }, 3000);
+        }
+        
+        // Initialize UI if already connected
+        if (tonConnectUI.connected) {
+            const address = tonConnectUI.wallet.account.address;
+            updateWalletUI(true, address);
+            localStorage.setItem('tonWalletAddress', address);
+            getBalance(address);
         }
     </script>
 </body>
