@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TON Payment Gateway</title>
+    <title>TON Wallet Connection</title>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
     <style>
@@ -99,19 +99,14 @@
             font-family: monospace;
             word-break: break-all;
             color: #00aaff;
-            margin-bottom: 8px;
+            margin-bottom: 16px;
             font-size: 14px;
         }
         
-        .balance {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-        
-        .balance-currency {
-            font-size: 16px;
-            color: #a0a0a0;
+        .wallet-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .connect-button {
@@ -144,7 +139,7 @@
             color: white;
             border: none;
             border-radius: 12px;
-            padding: 12px 16px;
+            padding: 12px 20px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -152,7 +147,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: 12px;
         }
         
         .disconnect-button:hover {
@@ -160,55 +154,10 @@
             box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3);
         }
         
-        .disconnect-button:active {
-            transform: translateY(0);
-        }
-        
-        .payment-section {
-            margin-top: 24px;
-        }
-        
-        .amount-input {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 16px;
-            color: white;
-            font-size: 16px;
-            margin-bottom: 16px;
-        }
-        
-        .amount-input:focus {
-            outline: none;
-            border-color: #0088cc;
-        }
-        
-        .payment-button {
-            background: linear-gradient(135deg, #28a745, #34ce57);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .payment-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
-        }
-        
-        .payment-button:disabled {
-            background: #555;
-            cursor: not-allowed;
-            transform: none;
+        .button-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
         }
         
         .notification {
@@ -263,10 +212,6 @@
             to { transform: rotate(360deg); }
         }
         
-        .icon {
-            margin-right: 8px;
-        }
-        
         .error-message {
             background: rgba(220, 53, 69, 0.2);
             border: 1px solid rgba(220, 53, 69, 0.3);
@@ -278,25 +223,15 @@
             display: none;
         }
         
-        .debug-info {
-            background: rgba(0, 0, 0, 0.3);
+        .airdrop-info {
+            background: rgba(23, 162, 184, 0.2);
+            border: 1px solid rgba(23, 162, 184, 0.3);
             border-radius: 8px;
-            padding: 12px;
-            margin-top: 16px;
-            font-size: 12px;
-            color: #888;
-            display: none;
-        }
-        
-        .wallet-connected {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .wallet-details {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 16px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #17a2b8;
+            text-align: center;
         }
     </style>
 </head>
@@ -304,8 +239,8 @@
     <div class="container">
         <div class="header">
             <div class="logo">₮</div>
-            <h1>TON Payment Gateway</h1>
-            <p class="subtitle">Secure payments with TON blockchain</p>
+            <h1>TON Wallet Connection</h1>
+            <p class="subtitle">Connect your wallet for future airdrop</p>
         </div>
         
         <div class="card">
@@ -315,34 +250,25 @@
                 <h2 class="section-title">Wallet Connection</h2>
                 
                 <div class="wallet-info" id="walletInfo">
-                    <div class="wallet-details">
-                        <div>
-                            <div class="wallet-address" id="walletAddress"></div>
-                            <div class="balance">
-                                <span id="balanceAmount">0</span>
-                                <span class="balance-currency">TON</span>
-                            </div>
-                        </div>
+                    <div class="wallet-address" id="walletAddress"></div>
+                    <div class="wallet-actions">
+                        <span style="color: #a0a0a0; font-size: 14px;">Connected for airdrop eligibility</span>
                         <button class="disconnect-button" id="disconnectButton">
-                            <span class="icon">🔌</span> Disconnect
+                            <img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="Disconnect" class="button-icon">
+                            Disconnect
                         </button>
                     </div>
                 </div>
                 
                 <button class="connect-button" id="connectButton">
-                    <span class="icon">🔗</span> Connect TON Wallet
+                    <img src="https://cdn-icons-png.flaticon.com/512/1791/1791330.png" alt="Connect" class="button-icon">
+                    Connect TON Wallet
                 </button>
             </div>
             
-            <div class="payment-section">
-                <h2 class="section-title">Make a Payment</h2>
-                <input type="number" class="amount-input" id="amountInput" placeholder="Enter amount in TON" min="4" step="0.01">
-                <button class="payment-button" id="paymentButton" disabled>
-                    <span class="icon">💳</span> Send Payment
-                </button>
+            <div class="airdrop-info">
+                Connect your wallet to be eligible for future airdrops. Your wallet address will be stored securely.
             </div>
-            
-            <div class="debug-info" id="debugInfo"></div>
         </div>
         
         <div class="footer">
@@ -366,15 +292,8 @@
         const disconnectButton = document.getElementById('disconnectButton');
         const walletInfo = document.getElementById('walletInfo');
         const walletAddress = document.getElementById('walletAddress');
-        const balanceAmount = document.getElementById('balanceAmount');
-        const amountInput = document.getElementById('amountInput');
-        const paymentButton = document.getElementById('paymentButton');
         const notification = document.getElementById('notification');
         const errorMessage = document.getElementById('errorMessage');
-        const debugInfo = document.getElementById('debugInfo');
-        
-        // User's wallet address
-        const userWalletAddress = 'UQACiEaN0Qt2TjpxBdJ7XZateCvEPjdA7qf5bMo5uCPLbSoh';
         
         // Initialize TonConnect with error handling
         let tonConnectUI = null;
@@ -409,7 +328,6 @@
                     const address = tonConnectUI.wallet.account.address;
                     updateWalletUI(true, address);
                     localStorage.setItem('tonWalletAddress', address);
-                    getBalance(address);
                 }
                 
                 hideError();
@@ -418,7 +336,7 @@
                 console.error('TonConnect initialization error:', error);
                 showError(`Failed to initialize: ${error.message}. Please ensure tonconnect-manifest.json is properly hosted.`);
                 connectButton.disabled = true;
-                connectButton.innerHTML = '<span class="icon">⚠️</span> Connection Error';
+                connectButton.innerHTML = '<span class="loading"></span> Connection Error';
             }
         }
         
@@ -429,7 +347,6 @@
                     const address = wallet.account.address;
                     updateWalletUI(true, address);
                     localStorage.setItem('tonWalletAddress', address);
-                    getBalance(address);
                 } else {
                     updateWalletUI(false);
                     localStorage.removeItem('tonWalletAddress');
@@ -455,49 +372,6 @@
                     showNotification('Failed to disconnect wallet. Please try again.', 'error');
                 }
             });
-            
-            // Payment button click handler
-            paymentButton.addEventListener('click', async () => {
-                const amount = parseFloat(amountInput.value);
-                
-                if (isNaN(amount) || amount < 4) {
-                    showNotification('Minimum amount is 4 TON', 'error');
-                    return;
-                }
-                
-                try {
-                    paymentButton.disabled = true;
-                    paymentButton.innerHTML = '<span class="loading"></span> Processing...';
-                    
-                    // Create transaction
-                    const transaction = {
-                        messages: [
-                            {
-                                address: userWalletAddress,
-                                amount: (amount * 1000000000).toString(), // Convert TON to nanotons
-                            }
-                        ]
-                    };
-                    
-                    // Send transaction
-                    await tonConnectUI.sendTransaction(transaction);
-                    
-                    // Show success message
-                    showNotification('Payment Successful', 'success');
-                    amountInput.value = '';
-                    
-                    // Update balance after successful payment
-                    if (tonConnectUI.connected) {
-                        getBalance(tonConnectUI.wallet.account.address);
-                    }
-                } catch (error) {
-                    console.error('Payment error:', error);
-                    showNotification('Payment failed. Please try again.', 'error');
-                } finally {
-                    paymentButton.disabled = false;
-                    paymentButton.innerHTML = '<span class="icon">💳</span> Send Payment';
-                }
-            });
         }
         
         // Update wallet UI based on connection status
@@ -506,29 +380,21 @@
                 // Show wallet info and disconnect button
                 walletInfo.style.display = 'block';
                 walletAddress.textContent = address;
-                paymentButton.disabled = false;
                 
                 // Hide connect button
                 connectButton.style.display = 'none';
+                
+                showNotification('Wallet connected successfully!', 'success');
             } else {
                 // Hide wallet info and disconnect button
                 walletInfo.style.display = 'none';
-                paymentButton.disabled = true;
                 
                 // Show connect button
                 connectButton.style.display = 'flex';
-            }
-        }
-        
-        // Get wallet balance
-        async function getBalance(address) {
-            try {
-                // For demo purposes, we'll use a mock balance
-                // In a real app, you would fetch the actual balance from the TON API
-                balanceAmount.textContent = (Math.random() * 10 + 1).toFixed(2);
-            } catch (error) {
-                console.error('Error fetching balance:', error);
-                balanceAmount.textContent = '0';
+                
+                if (address === '') {
+                    showNotification('Wallet disconnected', 'info');
+                }
             }
         }
         
