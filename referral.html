@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,maximum-scale=1" />
+  <title>Referral System</title>
+  
+  <style>
+    body {
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1A1A2E 0%, #16213E 30%, #0F3460 70%, #533483 100%);
+      color: #ffffff;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .referral-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    .referral-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    
+    .referral-link-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .referral-link {
+      flex: 1;
+      font-size: 12px;
+      color: #4ECDC4;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .copy-icon {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+    
+    .copy-icon:hover {
+      opacity: 1;
+    }
+    
+    .referral-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .referral-stat {
+      text-align: center;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .referral-stat-label {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.7);
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    
+    .referral-stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #4ECDC4;
+    }
+    
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #6B73FF 0%, #4ECDC4 100%);
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(107, 115, 255, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(107, 115, 255, 0.4);
+    }
+    
+    .welcome-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 40px 30px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    .welcome-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+    
+    .welcome-title {
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #6B73FF 0%, #4ECDC4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+    
+    .welcome-message {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    
+    .referrer-info {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .referrer-label {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    
+    .referrer-details {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .referrer-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid #4ECDC4;
+    }
+    
+    .referrer-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    
+    .referrer-id {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .welcome-countdown {
+      font-size: 14px;
+      color: #4ECDC4;
+      font-weight: 600;
+    }
+    
+    .referral-list-item {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .referral-list-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 2px solid #4ECDC4;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    
+    .referral-list-info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .referral-list-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .referral-list-id {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .referral-list-balance {
+      font-size: 14px;
+      font-weight: 600;
+      color: #4ECDC4;
+    }
+    
+    .referral-commission {
+      font-size: 12px;
+      font-weight: 600;
+      color: #FFD166;
+      margin-top: 4px;
+    }
+    
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+    
+    .modal-content {
+      background: linear-gradient(135deg, #1A1A2E 0%, #16213E 30%, #0F3460 70%, #533483 100%);
+      border-radius: 24px;
+      padding: 24px;
+      max-width: 480px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    }
+    
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    
+    .modal-title {
+      font-size: 24px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #6B73FF 0%, #4ECDC4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #ffffff;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="referral-card">
+    <div class="referral-title">Referral Program</div>
+    
+    <div class="referral-link-box">
+      <span class="referral-link" id="referralLink">https://t.me/YourBotName/myapp?startapp=USER_ID</span>
+      <img src="https://i.postimg.cc/W3CrXJsL/copy.gif?raw=true" 
+           class="copy-icon" 
+           id="copyReferralLink" 
+           alt="Copy" />
+    </div>
+    
+    <div class="referral-stats">
+      <div class="referral-stat">
+        <div class="referral-stat-label">Total Referrals</div>
+        <div class="referral-stat-value" id="referralCount">0</div>
+      </div>
+      <div class="referral-stat">
+        <div class="referral-stat-label">Total Earnings</div>
+        <div class="referral-stat-value" id="referralEarnings">0</div>
+      </div>
+    </div>
+    
+    <button class="btn-primary" id="viewReferralsBtn">View My Referrals</button>
+  </div>
+  
+  <!-- Referral List Modal -->
+  <div class="modal-overlay" id="referralModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">My Referrals</div>
+        <button class="modal-close" id="closeReferralModal">×</button>
+      </div>
+      <div id="referralListContent"></div>
+    </div>
+  </div>
+
+  <script>
+    // User data
+    let userId = 'USER_ID'; // This would be replaced with actual user ID
+    let userName = 'User Name'; // This would be replaced with actual user name
+    let referralCount = 0;
+    let totalReferralCommission = 0;
+    
+    // Utility Functions
+    function now() {
+      return Math.floor(Date.now() / 1000);
+    }
+    
+    function notify(message, duration = 2500) {
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      notification.textContent = message;
+      notification.style.position = 'fixed';
+      notification.style.top = '20px';
+      notification.style.left = '50%';
+      notification.style.transform = 'translateX(-50%)';
+      notification.style.background = 'linear-gradient(135deg, #6B73FF 0%, #4ECDC4 100%)';
+      notification.style.color = '#fff';
+      notification.style.padding = '16px 32px';
+      notification.style.borderRadius = '12px';
+      notification.style.fontSize = '14px';
+      notification.style.fontWeight = '600';
+      notification.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)';
+      notification.style.zIndex = '10000';
+      notification.style.maxWidth = '90%';
+      notification.style.textAlign = 'center';
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, duration);
+    }
+    
+    // Copy referral link
+    document.getElementById('copyReferralLink').addEventListener('click', () => {
+      const link = document.getElementById('referralLink').textContent;
+      navigator.clipboard.writeText(link).then(() => {
+        notify('Referral link copied to clipboard!');
+      });
+    });
+    
+    // View referrals
+    document.getElementById('viewReferralsBtn').addEventListener('click', () => {
+      showReferralList();
+    });
+    
+    // Close modal
+    document.getElementById('closeReferralModal').addEventListener('click', () => {
+      document.getElementById('referralModal').style.display = 'none';
+    });
+    
+    // Show referral list
+    function showReferralList() {
+      const modal = document.getElementById('referralModal');
+      const content = document.getElementById('referralListContent');
+      
+      // In a real implementation, you would fetch this data from your backend
+      // For demo purposes, we'll use mock data
+      const mockReferrals = [
+        {
+          id: '123456789',
+          name: 'John Doe',
+          avatar: 'https://via.placeholder.com/56',
+          balance: 15000,
+          commission: 3000
+        },
+        {
+          id: '987654321',
+          name: 'Jane Smith',
+          avatar: 'https://via.placeholder.com/56',
+          balance: 8000,
+          commission: 1600
+        },
+        {
+          id: '456789123',
+          name: 'Bob Johnson',
+          avatar: 'https://via.placeholder.com/56',
+          balance: 12000,
+          commission: 2400
+        }
+      ];
+      
+      if (mockReferrals.length === 0) {
+        content.innerHTML = '<div style="text-align: center; padding: 40px 20px; color: rgba(255, 255, 255, 0.7); font-size: 14px;">You haven\'t referred anyone yet. Share your referral link to start earning!</div>';
+      } else {
+        let html = '';
+        mockReferrals.forEach(referral => {
+          html += `
+            <div class="referral-list-item">
+              <img src="${referral.avatar}" class="referral-list-avatar" alt="${referral.name}" />
+              <div class="referral-list-info">
+                <div class="referral-list-name">${referral.name}</div>
+                <div class="referral-list-id">ID: ${referral.id}</div>
+                <div class="referral-list-balance">${referral.balance} SHB</div>
+                <div class="referral-commission">🤝 Commission: ${referral.commission} SHB</div>
+              </div>
+            </div>
+          `;
+        });
+        content.innerHTML = html;
+      }
+      
+      modal.style.display = 'flex';
+    }
+    
+    // Award Referral Commission
+    function awardReferralCommission(earnedAmount) {
+      // This function would be called when a referred user earns coins
+      // It would calculate the commission (20% in this case) and add it to the referrer's balance
+      
+      if (!userData.referredBy) {
+        console.log('No referrer for this user');
+        return;
+      }
+      
+      const commission = Math.floor(earnedAmount * 0.2); // 20% commission
+      const referrerId = userData.referredBy;
+      
+      console.log(`Awarding ${commission} SHB commission to referrer ${referrerId} for ${earnedAmount} SHB earned`);
+      
+      // In a real implementation, you would update the referrer's balance in your database
+      // and log the commission transaction
+      
+      return commission;
+    }
+    
+    // Process Referral
+    function processReferral(startParam) {
+      return new Promise((resolve) => {
+        if (!startParam) {
+          console.log('No referral parameter found');
+          resolve();
+          return;
+        }
+        
+        let referrerId = startParam;
+        
+        if (referrerId && referrerId !== userId) {
+          // Check if user was already referred
+          // In a real implementation, you would check this in your database
+          
+          console.log('Processing new referral...');
+          
+          // Show referral welcome screen
+          showReferralWelcome(referrerId).then(() => {
+            // Award referrer bonus (5000 SHB in this case)
+            console.log('Referrer awarded 5000 SHB bonus');
+            
+            // Save referral relationship
+            console.log('Referral link saved for user');
+            
+            notify('Welcome! Your referrer earned 5000 SHB!', 3000);
+            resolve();
+          });
+        } else {
+          resolve();
+        }
+      });
+    }
+    
+    // Show Referral Welcome Screen
+    function showReferralWelcome(referrerId) {
+      return new Promise((resolve) => {
+        // In a real implementation, you would fetch the referrer's data from your database
+        // For demo purposes, we'll use mock data
+        const mockReferrerData = {
+          name: 'Referrer Name',
+          avatar: 'https://via.placeholder.com/48'
+        };
+        
+        // Create welcome screen
+        const welcomeScreen = document.createElement('div');
+        welcomeScreen.style.position = 'fixed';
+        welcomeScreen.style.top = '0';
+        welcomeScreen.style.left = '0';
+        welcomeScreen.style.width = '100vw';
+        welcomeScreen.style.height = '100vh';
+        welcomeScreen.style.background = 'linear-gradient(135deg, #1A1A2E 0%, #16213E 30%, #0F3460 70%, #533483 100%)';
+        welcomeScreen.style.display = 'flex';
+        welcomeScreen.style.flexDirection = 'column';
+        welcomeScreen.style.alignItems = 'center';
+        welcomeScreen.style.justifyContent = 'center';
+        welcomeScreen.style.zIndex = '9998';
+        welcomeScreen.style.padding = '20px';
+        
+        welcomeScreen.innerHTML = `
+          <div class="welcome-card">
+            <div class="welcome-icon">🎉</div>
+            <div class="welcome-title">Welcome!</div>
+            <div class="welcome-message">You've been invited to join Shark Bounty</div>
+            <div class="referrer-info">
+              <div class="referrer-label">Your Referrer</div>
+              <div class="referrer-details">
+                <img src="${mockReferrerData.avatar}" class="referrer-avatar" alt="Referrer" />
+                <div>
+                  <div class="referrer-name">${mockReferrerData.name}</div>
+                  <div class="referrer-id">ID: ${referrerId}</div>
+                </div>
+              </div>
+            </div>
+            <div class="welcome-countdown" id="welcomeCountdown">Starting in 5 seconds...</div>
+          </div>
+        `;
+        
+        document.body.appendChild(welcomeScreen);
+        
+        let countdown = 5;
+        const countdownEl = document.getElementById('welcomeCountdown');
+        
+        const countdownInterval = setInterval(() => {
+          countdown--;
+          if (countdown > 0) {
+            countdownEl.textContent = `Starting in ${countdown} seconds...`;
+          } else {
+            clearInterval(countdownInterval);
+            document.body.removeChild(welcomeScreen);
+            resolve();
+          }
+        }, 1000);
+      });
+    }
+    
+    // Initialize
+    document.getElementById('referralLink').textContent = `https://t.me/YourBotName/myapp?startapp=${userId}`;
+    document.getElementById('referralCount').textContent = referralCount;
+    document.getElementById('referralEarnings').textContent = (referralCount * 5000) + totalReferralCommission;
+    
+    // In a real implementation, you would also set up listeners to update the referral count and earnings
+    // when new referrals are added or when commissions are earned
+  </script>
+</body>
+</html>
