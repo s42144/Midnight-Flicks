@@ -1,441 +1,294 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Midnight Flicks - Deposit 4 TON</title>
-
-  <!-- TonConnect manifest link (required by TON Connect) -->
-  <link rel="tonconnect" href="https://midnight-flicks-adults.vercel.app/tonconnect-manifest.json">
-
-  <!-- TonConnect SDK (UMD build) -->
-  <script src="https://cdn.jsdelivr.net/npm/@tonconnect/sdk/dist/tonconnect.umd.min.js"></script>
-
-  <style>
-    :root{
-      --bg:#0f1724;
-      --card:#0b1220;
-      --muted:#9aa6bf;
-      --accent:#7c5cff;
-      --success:#28c76f;
-      --danger:#ff6b6b;
-      --glass: rgba(255,255,255,0.03);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    }
-    html,body{
-      height:100%;
-      margin:0;
-      background: linear-gradient(180deg, #071029 0%, #0f1724 60%);
-      color:#e6eef8;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-    }
-    .wrap{
-      min-height:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:32px;
-      box-sizing:border-box;
-    }
-    .card{
-      width:100%;
-      max-width:520px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:14px;
-      padding:28px;
-      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
-      border: 1px solid rgba(255,255,255,0.03);
-    }
-    h1{
-      margin:0 0 8px 0;
-      font-size:20px;
-      letter-spacing: -0.2px;
-    }
-    p.lead{
-      margin:0 0 22px 0;
-      color:var(--muted);
-      font-size:14px;
-    }
-    .controls{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      flex-wrap:wrap;
-    }
-    button{
-      appearance:none;
-      border:0;
-      outline:0;
-      cursor:pointer;
-      padding:12px 16px;
-      border-radius:10px;
-      font-weight:600;
-      color:white;
-      background:linear-gradient(90deg,var(--accent), #5b8bff);
-      box-shadow: 0 6px 18px rgba(124,92,255,0.18), inset 0 -1px 0 rgba(255,255,255,0.03);
-      transition: transform .12s ease, box-shadow .12s;
-    }
-    button.secondary{
-      background: transparent;
-      color:var(--muted);
-      border:1px solid rgba(255,255,255,0.04);
-      box-shadow:none;
-      font-weight:600;
-    }
-    button:active{ transform: translateY(1px); }
-    .wallet-info{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      flex:1;
-      justify-content:space-between;
-      background:var(--glass);
-      padding:12px;
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,0.02);
-    }
-    .addr{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
-      color:#dbe9ff;
-      font-size:13px;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-      max-width:260px;
-    }
-    .status{
-      font-size:13px;
-      color:var(--muted);
-    }
-    .notice{
-      margin-top:18px;
-      padding:12px 14px;
-      border-radius:10px;
-      background: rgba(255,255,255,0.02);
-      color:var(--muted);
-      font-size:13px;
-    }
-    .success{
-      color:var(--success);
-      font-weight:700;
-    }
-    .error{
-      color:var(--danger);
-      font-weight:700;
-    }
-    footer{
-      margin-top:18px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      color:var(--muted);
-      font-size:13px;
-    }
-    .brand{
-      display:flex;gap:10px;align-items:center;
-    }
-    .logo{
-      width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#7c5cff,#5b8bff);
-      display:flex;align-items:center;justify-content:center;font-weight:700;color:white;
-      box-shadow: 0 6px 20px rgba(92,72,255,0.18);
-    }
-    @media (max-width:520px){
-      .controls{ flex-direction:column; align-items:stretch; }
-      .wallet-info{ justify-content:flex-start; gap:10px; }
-    }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <div class="card" role="region" aria-label="TON payment">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
-        <div>
-          <h1>Deposit 4 TON</h1>
-          <p class="lead">Connect a TON-compatible wallet and send a minimum deposit of 4 TON to access premium content.</p>
-        </div>
-        <div style="text-align:right;">
-          <div style="color:var(--muted);font-size:12px;">Receiver</div>
-          <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;color:#dbe9ff;">
-            UQACiEaN0Qt2TjpxBdJ7XZateCvEPjdA7qf5bMo5uCPLbSoh
-          </div>
-        </div>
-      </div>
-
-      <div style="height:14px"></div>
-
-      <div class="controls" role="form" aria-label="wallet controls">
-        <div class="wallet-info" id="walletInfo" aria-live="polite">
-          <div>
-            <div style="font-size:12px;color:var(--muted)">Connected Wallet</div>
-            <div class="addr" id="walletAddress">Not connected</div>
-          </div>
-          <div class="status" id="connStatus">Idle</div>
-        </div>
-
-        <div style="display:flex;gap:8px;align-items:center;">
-          <button id="connectBtn">Connect TON Wallet</button>
-          <button class="secondary" id="payBtn" title="Send 4 TON">Pay 4 TON</button>
-        </div>
-      </div>
-
-      <div class="notice" id="notice">Minimum deposit: <strong>4 TON</strong>. No backend — this page initiates the TON Transfer request using TON Connect.</div>
-
-      <footer>
-        <div class="brand">
-          <div class="logo">MF</div>
-          <div style="line-height:1;">
-            <div style="font-weight:700">Midnight Flicks</div>
-            <div style="font-size:12px;color:var(--muted)">Private content access</div>
-          </div>
-        </div>
-        <div id="resultMessage" aria-live="polite"></div>
-      </footer>
-    </div>
-  </div>
-
-  <script>
-    // ----------------------------------------------------
-    // Configuration (user-provided)
-    // ----------------------------------------------------
-    const RECEIVER_ADDRESS = 'UQACiEaN0Qt2TjpxBdJ7XZateCvEPjdA7qf5bMo5uCPLbSoh';
-    const MIN_TON = 4; // TON
-    const MIN_NANO = String(Math.floor(MIN_TON * 1e9)); // TonConnect uses nanotons (1 TON = 1e9 nanotons)
-    const MANIFEST_URL = 'https://midnight-flicks-adults.vercel.app/tonconnect-manifest.json';
-    const LOCAL_STORAGE_KEY = 'ton_connected_address';
-
-    // ----------------------------------------------------
-    // Helpers & UI
-    // ----------------------------------------------------
-    const connectBtn = document.getElementById('connectBtn');
-    const payBtn = document.getElementById('payBtn');
-    const walletAddressEl = document.getElementById('walletAddress');
-    const connStatusEl = document.getElementById('connStatus');
-    const resultMessageEl = document.getElementById('resultMessage');
-
-    function setStatus(text, tone){
-      connStatusEl.textContent = text;
-      connStatusEl.style.color = tone === 'ok' ? 'var(--success)' : tone === 'err' ? 'var(--danger)' : 'var(--muted)';
-    }
-    function showResult(text, ok=false){
-      resultMessageEl.textContent = text;
-      resultMessageEl.className = ok ? 'success' : 'error';
-    }
-    function clearResult(){
-      resultMessageEl.textContent = '';
-      resultMessageEl.className = '';
-    }
-
-    // ----------------------------------------------------
-    // Telegram WebApp compatibility
-    // ----------------------------------------------------
-    function telegramSafeReady(){
-      try{
-        if(window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.ready === 'function'){
-          window.Telegram.WebApp.ready();
-          // Optionally expand the Telegram WebApp to show more UI
-          if(typeof window.Telegram.WebApp.expand === 'function'){
-            window.Telegram.WebApp.expand();
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TON Payment Gateway</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-      }catch(e){
-        // ignore
-      }
-    }
-
-    // ----------------------------------------------------
-    // TON Connect integration
-    // ----------------------------------------------------
-    // Ensure TonConnect SDK is available
-    if(typeof TonConnect === 'undefined'){
-      setStatus('TonConnect SDK not loaded', 'err');
-      showResult('TonConnect SDK failed to load. Check network or SDK URL.');
-      console.error('TonConnect SDK is missing.');
-    }
-
-    // Create TonConnect instance with manifest (important)
-    const tonConnect = new TonConnect({
-      manifestUrl: MANIFEST_URL
-    });
-
-    // When a wallet session gets connected, sdk stores session in local storage internally
-    // We'll read the selected account from the session object if present.
-    async function updateConnectedFromSession(){
-      // First, check local storage for previously saved address
-      const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if(stored){
-        walletAddressEl.textContent = stored;
-        setStatus('Connected (cached)', 'ok');
-        connectBtn.textContent = 'Connected';
-        connectBtn.disabled = false;
-        return;
-      }
-
-      // TonConnect exposes 'account' property when connected
-      // Note: UMD TonConnect may expose current session at tonConnect.account
-      try{
-        if(tonConnect.account && tonConnect.account.address){
-          const addr = tonConnect.account.address;
-          walletAddressEl.textContent = addr;
-          localStorage.setItem(LOCAL_STORAGE_KEY, addr);
-          setStatus('Connected', 'ok');
-          connectBtn.textContent = 'Connected';
-          return;
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-      }catch(e){
-        // ignore
-      }
-
-      walletAddressEl.textContent = 'Not connected';
-      setStatus('Idle');
-      connectBtn.textContent = 'Connect TON Wallet';
-    }
-
-    // Connect button handler
-    connectBtn.addEventListener('click', async function(){
-      clearResult();
-      try{
-        setStatus('Connecting...');
-        // TonConnect.connect() opens the wallet selection UI (if needed)
-        // It returns a session object when successful.
-        const session = await tonConnect.connect();
-        // session.accounts is an array of connected account objects; take first.
-        const address = (session && session.account && session.account.address) ||
-                        (session && session.accounts && session.accounts[0] && session.accounts[0].address) ||
-                        (tonConnect.account && tonConnect.account.address) || null;
-
-        if(address){
-          walletAddressEl.textContent = address;
-          localStorage.setItem(LOCAL_STORAGE_KEY, address);
-          setStatus('Connected', 'ok');
-          connectBtn.textContent = 'Connected';
-          connectBtn.disabled = false;
-          // If inside Telegram WebApp, inform Telegram that we have a connected user (optional)
-          try{ telegramSafeReady(); }catch(e){}
-        }else{
-          // Some wallets return session differently; handle generically.
-          walletAddressEl.textContent = 'Connected';
-          setStatus('Connected', 'ok');
-          connectBtn.textContent = 'Connected';
+        .ton-button {
+            background: linear-gradient(90deg, #0088cc, #00aaff);
+            transition: all 0.3s ease;
         }
-      }catch(err){
-        console.error('Connection failed', err);
-        setStatus('Connection failed', 'err');
-        showResult('Connection canceled or failed.');
-      }
-    });
-
-    // Payment function: sends a transfer request via TonConnect
-    async function sendPayment(){
-      clearResult();
-      // Ensure wallet connected
-      let addr = localStorage.getItem(LOCAL_STORAGE_KEY) || (tonConnect.account && tonConnect.account.address);
-      if(!addr){
-        showResult('Please connect a TON wallet first.');
-        return;
-      }
-
-      // Build a transfer message compliant with TonConnect
-      const transfer = {
-        // validUntil in seconds (optional). We'll set for 5 minutes from now.
-        validUntil: Math.floor(Date.now() / 1000) + 60 * 5,
-        messages: [
-          {
-            // type 'transfer' used by many tonconnect-compatible wallets
-            type: 'transfer',
-            to: RECEIVER_ADDRESS,
-            amount: MIN_NANO,
-            // optional text/payload
-            text: `Deposit ${MIN_TON} TON — Midnight Flicks`
-          }
-        ]
-      };
-
-      try{
-        setStatus('Requesting payment...');
-        // tonConnect.sendTransaction is the recommended method in TonConnect SDK
-        // It returns a promise which resolves after wallet accepts/sends the transaction
-        // Some SDK versions use tonConnect.sendTransaction(transfer) directly
-        // Use the safe-call pattern to support multiple SDK versions:
-        let res;
-        if(typeof tonConnect.sendTransaction === 'function'){
-          res = await tonConnect.sendTransaction(transfer);
-        }else if(typeof tonConnect.requestTransfer === 'function'){
-          // fallback names (if any)
-          res = await tonConnect.requestTransfer(transfer);
-        }else if(typeof tonConnect.provider === 'object' && typeof tonConnect.provider.postMessage === 'function'){
-          // Very defensive fallback: try request through provider (rare)
-          res = await tonConnect.request(transfer);
-        }else{
-          throw new Error('TonConnect sendTransaction API not found in SDK.');
+        .ton-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 136, 204, 0.3);
         }
-
-        // If no thrown error, consider it successful. Some wallets may return a result object.
-        console.log('TonConnect transfer response:', res);
-
-        // Show success to user
-        setStatus('Payment sent', 'ok');
-        showResult('Payment Successful', true);
-
-        // Optionally, update UI or store that user paid (client-only)
-        localStorage.setItem('midnight_flicks_paid', '1');
-
-      }catch(err){
-        console.error('Payment failed or canceled', err);
-        setStatus('Payment failed', 'err');
-        showResult('Payment failed or canceled.');
-      }
-    }
-
-    // Hook up pay button
-    payBtn.addEventListener('click', async function(){
-      // Disable button briefly to prevent double clicks
-      payBtn.disabled = true;
-      payBtn.style.opacity = '0.9';
-      await sendPayment();
-      setTimeout(()=>{ payBtn.disabled = false; payBtn.style.opacity = '1'; }, 600);
-    });
-
-    // On load: try to read persisted address and update UI
-    (async function init(){
-      // Ensure Telegram WebApp ready if present
-      telegramSafeReady();
-
-      // If a cached address exists, show it
-      const cached = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if(cached){
-        walletAddressEl.textContent = cached;
-        setStatus('Connected (cached)', 'ok');
-        connectBtn.textContent = 'Connected';
-      } else {
-        // Try to read tonConnect.session/account if available (e.g., wallet restored)
-        try{ await updateConnectedFromSession(); }catch(e){}
-      }
-
-      // Listen for TonConnect events: when session appears/disappears
-      try{
-        if(typeof tonConnect.on === 'function'){
-          tonConnect.on('connect', (session) => {
-            const addr = (session && session.account && session.account.address) ||
-                         (session && session.accounts && session.accounts[0] && session.accounts[0].address);
-            if(addr){
-              localStorage.setItem(LOCAL_STORAGE_KEY, addr);
-              walletAddressEl.textContent = addr;
-              setStatus('Connected', 'ok');
-              connectBtn.textContent = 'Connected';
+        .notification {
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
             }
-          });
-          tonConnect.on('disconnect', () => {
-            localStorage.removeItem(LOCAL_STORAGE_KEY);
-            walletAddressEl.textContent = 'Not connected';
-            setStatus('Idle');
-            connectBtn.textContent = 'Connect TON Wallet';
-          });
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
-      }catch(e){
-        // Some SDK versions may not support on(); ignore gracefully
-      }
-    })();
-  </script>
+        .loader {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div id="notification" class="fixed top-5 right-5 p-4 rounded-lg text-white hidden notification z-50"></div>
+    
+    <div class="glass-effect rounded-2xl p-8 max-w-md w-full shadow-2xl">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-500 rounded-full mb-4">
+                <i class="fab fa-telegram text-white text-2xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-white mb-2">TON Payment Gateway</h1>
+            <p class="text-blue-100">Connect your TON wallet to make a payment</p>
+        </div>
+
+        <div id="wallet-section" class="mb-6">
+            <div id="wallet-info" class="hidden mb-4 p-4 bg-blue-500 bg-opacity-20 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm">Connected Wallet</p>
+                        <p id="wallet-address" class="text-white font-medium"></p>
+                    </div>
+                    <button id="disconnect-btn" class="text-red-300 hover:text-red-100 transition">
+                        <i class="fas fa-times-circle text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="connect-section">
+                <button id="connect-wallet-btn" class="ton-button w-full py-3 px-4 rounded-lg text-white font-medium flex items-center justify-center">
+                    <i class="fab fa-telegram-plane mr-2"></i>
+                    Connect TON Wallet
+                </button>
+            </div>
+        </div>
+
+        <div id="payment-section" class="hidden">
+            <div class="mb-6 p-4 bg-blue-500 bg-opacity-20 rounded-lg">
+                <div class="flex justify-between mb-2">
+                    <span class="text-blue-100">Minimum Deposit</span>
+                    <span class="text-white font-medium">4 TON</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-blue-100">Recipient</span>
+                    <span class="text-white font-medium text-sm">UQACiEaN0Qt2TjpxBdJ7XZateCvEPjdA7qf5bMo5uCPLbSoh</span>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="amount-input" class="block text-blue-100 mb-2">Amount (TON)</label>
+                <input id="amount-input" type="number" min="4" step="0.01" placeholder="Enter amount (min: 4 TON)" 
+                    class="w-full p-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-blue-200 border border-blue-300 border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            </div>
+            
+            <button id="pay-btn" class="ton-button w-full py-3 px-4 rounded-lg text-white font-medium flex items-center justify-center">
+                <i class="fas fa-paper-plane mr-2"></i>
+                Send Payment
+            </button>
+        </div>
+
+        <div id="status-section" class="hidden mt-6 p-4 rounded-lg text-center">
+            <div id="status-icon" class="mb-3"></div>
+            <p id="status-message" class="text-white font-medium"></p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Telegram WebApp
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
+
+        // Initialize TonConnect
+        const tonConnectUI = new TonConnectUI({
+            manifestUrl: 'https://midnight-flicks-adults.vercel.app/tonconnect-manifest.json',
+            buttonRootId: null
+        });
+
+        // DOM Elements
+        const connectWalletBtn = document.getElementById('connect-wallet-btn');
+        const disconnectBtn = document.getElementById('disconnect-btn');
+        const walletInfo = document.getElementById('wallet-info');
+        const walletAddress = document.getElementById('wallet-address');
+        const connectSection = document.getElementById('connect-section');
+        const paymentSection = document.getElementById('payment-section');
+        const payBtn = document.getElementById('pay-btn');
+        const amountInput = document.getElementById('amount-input');
+        const statusSection = document.getElementById('status-section');
+        const statusIcon = document.getElementById('status-icon');
+        const statusMessage = document.getElementById('status-message');
+        const notification = document.getElementById('notification');
+
+        // Constants
+        const RECIPIENT_WALLET = 'UQACiEaN0Qt2TjpxBdJ7XZateCvEPjdA7qf5bMo5uCPLbSoh';
+        const MIN_DEPOSIT = 4;
+
+        // Check if wallet was previously connected
+        const savedWalletAddress = localStorage.getItem('tonWalletAddress');
+        if (savedWalletAddress) {
+            showWalletConnected(savedWalletAddress);
+        }
+
+        // Event Listeners
+        connectWalletBtn.addEventListener('click', connectWallet);
+        disconnectBtn.addEventListener('click', disconnectWallet);
+        payBtn.addEventListener('click', sendPayment);
+
+        // TonConnect event listeners
+        tonConnectUI.onStatusChange(wallet => {
+            if (wallet) {
+                const address = wallet.account.address;
+                const formattedAddress = formatAddress(address);
+                localStorage.setItem('tonWalletAddress', address);
+                showWalletConnected(formattedAddress);
+            } else {
+                localStorage.removeItem('tonWalletAddress');
+                showWalletDisconnected();
+            }
+        });
+
+        // Functions
+        async function connectWallet() {
+            try {
+                await tonConnectUI.connectWallet();
+            } catch (error) {
+                showNotification('Failed to connect wallet', 'error');
+                console.error('Connection error:', error);
+            }
+        }
+
+        function disconnectWallet() {
+            tonConnectUI.disconnect();
+        }
+
+        function showWalletConnected(address) {
+            walletAddress.textContent = address;
+            walletInfo.classList.remove('hidden');
+            connectSection.classList.add('hidden');
+            paymentSection.classList.remove('hidden');
+        }
+
+        function showWalletDisconnected() {
+            walletInfo.classList.add('hidden');
+            connectSection.classList.remove('hidden');
+            paymentSection.classList.add('hidden');
+        }
+
+        function formatAddress(address) {
+            if (!address) return '';
+            return `${address.slice(0, 6)}...${address.slice(-4)}`;
+        }
+
+        async function sendPayment() {
+            const amount = parseFloat(amountInput.value);
+            
+            if (isNaN(amount) || amount < MIN_DEPOSIT) {
+                showNotification(`Minimum deposit is ${MIN_DEPOSIT} TON`, 'error');
+                return;
+            }
+
+            try {
+                showStatus('processing');
+                
+                // Convert TON to nanotons (1 TON = 1 billion nanotons)
+                const nanotons = Math.floor(amount * 1e9);
+                
+                const transaction = {
+                    messages: [
+                        {
+                            address: RECIPIENT_WALLET,
+                            amount: nanotons.toString()
+                        }
+                    ]
+                };
+
+                const result = await tonConnectUI.sendTransaction(transaction);
+                
+                if (result) {
+                    showStatus('success');
+                    showNotification('Payment Successful', 'success');
+                    amountInput.value = '';
+                } else {
+                    showStatus('error');
+                    showNotification('Payment failed', 'error');
+                }
+            } catch (error) {
+                showStatus('error');
+                showNotification('Transaction error: ' + error.message, 'error');
+                console.error('Transaction error:', error);
+            }
+        }
+
+        function showStatus(type) {
+            statusSection.classList.remove('hidden');
+            
+            if (type === 'processing') {
+                statusIcon.innerHTML = '<div class="loader mx-auto"></div>';
+                statusMessage.textContent = 'Processing payment...';
+                statusSection.className = 'mt-6 p-4 rounded-lg text-center bg-blue-500 bg-opacity-20';
+                payBtn.disabled = true;
+                payBtn.innerHTML = '<div class="loader mx-auto"></div>';
+            } else if (type === 'success') {
+                statusIcon.innerHTML = '<i class="fas fa-check-circle text-green-400 text-3xl"></i>';
+                statusMessage.textContent = 'Payment Successful';
+                statusSection.className = 'mt-6 p-4 rounded-lg text-center bg-green-500 bg-opacity-20';
+                payBtn.disabled = false;
+                payBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send Payment';
+            } else if (type === 'error') {
+                statusIcon.innerHTML = '<i class="fas fa-exclamation-circle text-red-400 text-3xl"></i>';
+                statusMessage.textContent = 'Payment Failed';
+                statusSection.className = 'mt-6 p-4 rounded-lg text-center bg-red-500 bg-opacity-20';
+                payBtn.disabled = false;
+                payBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send Payment';
+            }
+            
+            // Hide status after 5 seconds for success or error
+            if (type === 'success' || type === 'error') {
+                setTimeout(() => {
+                    statusSection.classList.add('hidden');
+                }, 5000);
+            }
+        }
+
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.classList.remove('hidden');
+            
+            if (type === 'success') {
+                notification.className = 'fixed top-5 right-5 p-4 rounded-lg text-white notification z-50 bg-green-500';
+            } else if (type === 'error') {
+                notification.className = 'fixed top-5 right-5 p-4 rounded-lg text-white notification z-50 bg-red-500';
+            }
+            
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
 </body>
 </html>
