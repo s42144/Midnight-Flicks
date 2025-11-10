@@ -22,7 +22,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
-  <!-- TON Connect SDK -->
+  <!-- TON Connect -->
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
   
@@ -1056,12 +1056,6 @@
       text-align: center;
     }
     
-    .wallet-input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    
     .input-field {
       width: 100%;
       padding: 12px 16px;
@@ -1243,10 +1237,6 @@
     }
     
     /* TON Wallet Connection Styles */
-    .ton-wallet-section {
-      margin-top: 20px;
-    }
-    
     .ton-wallet-card {
       background: var(--card-bg);
       backdrop-filter: blur(20px);
@@ -1259,52 +1249,50 @@
       overflow: hidden;
     }
     
+    .ton-wallet-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(0, 136, 204, 0.1), rgba(0, 170, 255, 0.1));
+      z-index: 0;
+    }
+    
+    .ton-wallet-card > * {
+      position: relative;
+      z-index: 1;
+    }
+    
     .ton-wallet-header {
       display: flex;
       align-items: center;
-      justify-content: center;
+      gap: 16px;
       margin-bottom: 20px;
-      position: relative;
     }
     
-    .ton-wallet-logo {
-      width: 60px;
-      height: 60px;
+    .ton-wallet-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
       background: linear-gradient(135deg, #0088cc, #00aaff);
-      border-radius: 15px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 30px;
-      color: white;
-      box-shadow: 0 8px 20px rgba(0, 136, 204, 0.3);
-      animation: tonPulse 2s infinite;
-    }
-    
-    @keyframes tonPulse {
-      0%, 100% {
-        transform: scale(1);
-        box-shadow: 0 8px 20px rgba(0, 136, 204, 0.3);
-      }
-      50% {
-        transform: scale(1.05);
-        box-shadow: 0 12px 25px rgba(0, 136, 204, 0.5);
-      }
+      font-size: 28px;
+      box-shadow: 0 10px 20px rgba(0, 136, 204, 0.3);
     }
     
     .ton-wallet-title {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 700;
       color: var(--text-primary);
-      margin-bottom: 8px;
-      text-align: center;
     }
     
     .ton-wallet-subtitle {
       font-size: 14px;
       color: var(--text-secondary);
-      text-align: center;
-      margin-bottom: 20px;
     }
     
     .ton-wallet-info {
@@ -1314,18 +1302,6 @@
       margin-bottom: 20px;
       display: none;
       border: 1px solid rgba(0, 136, 204, 0.3);
-      animation: slideIn 0.5s ease-out;
-    }
-    
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateX(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
     }
     
     .ton-wallet-address-container {
@@ -1453,7 +1429,7 @@
       color: white;
       border: none;
       border-radius: 12px;
-      padding: 10px 20px;
+      padding: 12px 20px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
@@ -1530,9 +1506,20 @@
     }
     
     .ton-airdrop-icon {
-      font-size: 20px;
-      margin-bottom: 6px;
+      font-size: 24px;
+      margin-bottom: 8px;
       display: block;
+    }
+    
+    .ton-loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
     }
     
     .ton-error-message {
@@ -1551,17 +1538,6 @@
       0%, 100% { transform: translateX(0); }
       25% { transform: translateX(-10px); }
       75% { transform: translateX(10px); }
-    }
-    
-    .ton-loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
-      margin-right: 10px;
     }
     
     /* Ranking Section */
@@ -2883,6 +2859,130 @@
       };
     }
     
+    // NEW: Initialize TON Connect
+    async function initializeTonConnect() {
+      try {
+        // Try to create manifest URL with proper fallback
+        const manifestUrl = 'https://shark-silk-two.vercel.app/tonconnect-manifest.json';
+        
+        // Check if manifest is accessible
+        const manifestResponse = await fetch(manifestUrl);
+        if (!manifestResponse.ok) {
+          throw new Error(`Manifest not accessible: ${manifestResponse.status}`);
+        }
+        
+        tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+          manifestUrl: manifestUrl,
+          buttonRootId: null
+        });
+        
+        // Set up event listeners
+        setupTonConnectListeners();
+        
+        // Check if wallet was previously connected
+        const savedWalletAddress = localStorage.getItem('tonWalletAddress');
+        if (savedWalletAddress) {
+          tonWalletConnected = true;
+          tonWalletAddress = savedWalletAddress;
+        }
+        
+        // Initialize UI if already connected
+        if (tonConnectUI.connected) {
+          const address = tonConnectUI.wallet.account.address;
+          tonWalletConnected = true;
+          tonWalletAddress = address;
+          localStorage.setItem('tonWalletAddress', address);
+        }
+        
+        console.log('TON Connect initialized successfully');
+        
+      } catch (error) {
+        console.error('TonConnect initialization error:', error);
+        notify(`Failed to initialize TON Connect: ${error.message}`, 5000);
+      }
+    }
+    
+    // NEW: Setup TON Connect Listeners
+    function setupTonConnectListeners() {
+      // Listen for wallet connection status changes
+      tonConnectUI.onStatusChange(wallet => {
+        if (wallet) {
+          const address = wallet.account.address;
+          tonWalletConnected = true;
+          tonWalletAddress = address;
+          localStorage.setItem('tonWalletAddress', address);
+          
+          // Save to Firebase
+          db.ref('users/' + userId).update({
+            tonWallet: address
+          });
+          
+          notify('TON wallet connected successfully!', 3000);
+        } else {
+          tonWalletConnected = false;
+          tonWalletAddress = null;
+          localStorage.removeItem('tonWalletAddress');
+          
+          // Remove from Firebase
+          db.ref('users/' + userId).update({
+            tonWallet: null
+          });
+          
+          notify('TON wallet disconnected', 3000);
+        }
+        
+        // Update UI if we're on profile page
+        const activeTab = document.querySelector('.nav-btn.active');
+        if (activeTab && activeTab.dataset.tab === 'profile') {
+          renderProfile();
+        }
+      });
+    }
+    
+    // NEW: Connect TON Wallet
+    async function connectTonWallet() {
+      if (!tonConnectUI) {
+        notify('TON Connect is not initialized yet', 3000);
+        return;
+      }
+      
+      try {
+        await tonConnectUI.connectWallet();
+      } catch (error) {
+        console.error('Connection error:', error);
+        notify('Failed to connect wallet. Please try again.', 3000);
+      }
+    }
+    
+    // NEW: Disconnect TON Wallet
+    async function disconnectTonWallet() {
+      if (!tonConnectUI) {
+        notify('TON Connect is not initialized yet', 3000);
+        return;
+      }
+      
+      try {
+        await tonConnectUI.disconnect();
+      } catch (error) {
+        console.error('Disconnection error:', error);
+        notify('Failed to disconnect wallet. Please try again.', 3000);
+      }
+    }
+    
+    // NEW: Copy TON Wallet Address
+    function copyTonAddress() {
+      if (!tonWalletAddress) {
+        notify('No wallet address to copy', 3000);
+        return;
+      }
+      
+      navigator.clipboard.writeText(tonWalletAddress).then(() => {
+        notify('TON wallet address copied to clipboard!', 3000);
+      }).catch(() => {
+        notify('Failed to copy address', 3000);
+      });
+    }
+    
     function loadUserData() {
       updateLoadingProgress('Loading your data...');
       
@@ -2892,6 +2992,13 @@
         if (snap.exists()) {
           userData = snap.val();
           console.log('Existing user data loaded');
+          
+          // Load TON wallet address from Firebase
+          if (userData.tonWallet) {
+            tonWalletConnected = true;
+            tonWalletAddress = userData.tonWallet;
+            localStorage.setItem('tonWalletAddress', tonWalletAddress);
+          }
         } else {
           userData = {
             balance: 0,
@@ -2902,6 +3009,7 @@
             multiTapCount: 0,
             maxEnergyUpCount: 0,
             ton: "",
+            tonWallet: null,
             avatar: userAvatar,
             name: userName,
             referrals: 0,
@@ -3021,6 +3129,9 @@
         
         // NEW: Setup restricted users listener
         setupRestrictedUsersListener();
+        
+        // NEW: Initialize TON Connect
+        initializeTonConnect();
         
         db.ref('users/' + userId).update({
           energy: userData.energy,
@@ -3915,45 +4026,45 @@
               </div>
             </div>
             
-            <div class="ton-wallet-section">
-              <div class="ton-wallet-card">
-                <div class="ton-wallet-header">
-                  <div class="ton-wallet-logo">₮</div>
+            <div class="ton-wallet-card">
+              <div class="ton-wallet-header">
+                <div class="ton-wallet-icon">₮</div>
+                <div>
+                  <div class="ton-wallet-title">TON Wallet Connection</div>
+                  <div class="ton-wallet-subtitle">Connect your wallet for future airdrop</div>
                 </div>
-                <div class="ton-wallet-title">TON Wallet Connection</div>
-                <div class="ton-wallet-subtitle">Connect your wallet for future airdrop</div>
-                
-                <div class="ton-error-message" id="tonErrorMessage"></div>
-                
-                <div class="ton-wallet-info" id="tonWalletInfo">
-                  <div class="ton-wallet-address-container">
-                    <div class="ton-wallet-address" id="tonWalletAddress"></div>
-                    <button class="ton-copy-button" onclick="copyTonAddress()">
-                      <img src="https://cdn-icons-png.flaticon.com/512/660/660620.png" alt="Copy" class="ton-copy-icon">
-                      Copy Address
-                    </button>
+              </div>
+              
+              <div class="ton-error-message" id="tonErrorMessage"></div>
+              
+              <div class="ton-wallet-info" id="tonWalletInfo">
+                <div class="ton-wallet-address-container">
+                  <div class="ton-wallet-address" id="tonWalletAddress">${tonWalletAddress || 'No wallet connected'}</div>
+                  <button class="ton-copy-button" onclick="copyTonAddress()">
+                    <img src="https://cdn-icons-png.flaticon.com/512/660/660620.png" alt="Copy" class="ton-copy-icon">
+                    Copy Address
+                  </button>
+                </div>
+                <div class="ton-wallet-actions">
+                  <div class="ton-status-badge">
+                    <span class="ton-status-dot"></span>
+                    Connected for Airdrop
                   </div>
-                  <div class="ton-wallet-actions">
-                    <div class="ton-status-badge">
-                      <span class="ton-status-dot"></span>
-                      Connected for Airdrop
-                    </div>
-                    <button class="ton-disconnect-button" id="tonDisconnectButton">
-                      <img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="Disconnect" class="ton-button-icon">
-                      Disconnect
-                    </button>
-                  </div>
+                  <button class="ton-disconnect-button" id="tonDisconnectButton">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="Disconnect" class="ton-button-icon">
+                    Disconnect
+                  </button>
                 </div>
-                
-                <button class="ton-connect-button" id="tonConnectButton">
-                  <img src="https://cdn-icons-png.flaticon.com/512/1791/1791330.png" alt="Connect" class="ton-button-icon">
-                  Connect TON Wallet
-                </button>
-                
-                <div class="ton-airdrop-info">
-                  <span class="ton-airdrop-icon">🎁</span>
-                  Connect your wallet to be eligible for future airdrops. Your wallet address will be stored securely.
-                </div>
+              </div>
+              
+              <button class="ton-connect-button" id="tonConnectButton">
+                <img src="https://cdn-icons-png.flaticon.com/512/1791/1791330.png" alt="Connect" class="ton-button-icon">
+                Connect TON Wallet
+              </button>
+              
+              <div class="ton-airdrop-info">
+                <span class="ton-airdrop-icon">🎁</span>
+                Connect your wallet to be eligible for future airdrops. Your wallet address will be stored securely.
               </div>
             </div>
             
@@ -3996,6 +4107,25 @@
         `;
         
         document.getElementById('main-content').innerHTML = html;
+        
+        // Setup TON Wallet UI
+        const tonWalletInfo = document.getElementById('tonWalletInfo');
+        const tonConnectButton = document.getElementById('tonConnectButton');
+        const tonDisconnectButton = document.getElementById('tonDisconnectButton');
+        const tonWalletAddressEl = document.getElementById('tonWalletAddress');
+        
+        if (tonWalletConnected && tonWalletAddress) {
+          tonWalletInfo.style.display = 'block';
+          tonConnectButton.style.display = 'none';
+          tonWalletAddressEl.textContent = tonWalletAddress;
+        } else {
+          tonWalletInfo.style.display = 'none';
+          tonConnectButton.style.display = 'flex';
+        }
+        
+        // Add event listeners for TON Connect
+        tonConnectButton.addEventListener('click', connectTonWallet);
+        tonDisconnectButton.addEventListener('click', disconnectTonWallet);
         
         document.getElementById('copyUserId').addEventListener('click', () => {
           navigator.clipboard.writeText(userId).then(() => {
@@ -4060,154 +4190,7 @@
             }
           });
         });
-        
-        // Initialize TON Connect
-        initializeTonConnect();
       });
-    }
-    
-    // NEW: Initialize TON Connect
-    async function initializeTonConnect() {
-      try {
-        // Create manifest URL with the updated URL
-        const manifestUrl = 'https://shark-silk-two.vercel.app/tonconnect-manifest.json';
-        
-        // Check if manifest is accessible
-        const manifestResponse = await fetch(manifestUrl);
-        if (!manifestResponse.ok) {
-          throw new Error(`Manifest not accessible: ${manifestResponse.status}`);
-        }
-        
-        tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-          manifestUrl: manifestUrl,
-          buttonRootId: null
-        });
-        
-        // Set up event listeners
-        setupTonConnectListeners();
-        
-        // Check if wallet was previously connected
-        const savedWalletAddress = localStorage.getItem('tonWalletAddress');
-        if (savedWalletAddress) {
-          updateTonWalletUI(true, savedWalletAddress);
-        }
-        
-        // Initialize UI if already connected
-        if (tonConnectUI.connected) {
-          const address = tonConnectUI.wallet.account.address;
-          updateTonWalletUI(true, address);
-          localStorage.setItem('tonWalletAddress', address);
-          
-          // Save to Firebase
-          db.ref('users/' + userId).update({
-            ton: address
-          });
-        }
-        
-        hideTonError();
-        
-      } catch (error) {
-        console.error('TonConnect initialization error:', error);
-        showTonError(`Failed to initialize: ${error.message}. Please ensure tonconnect-manifest.json is properly hosted.`);
-        document.getElementById('tonConnectButton').disabled = true;
-        document.getElementById('tonConnectButton').innerHTML = '<span class="ton-loading"></span> Connection Error';
-      }
-    }
-    
-    // NEW: Setup TON Connect event listeners
-    function setupTonConnectListeners() {
-      // Listen for wallet connection status changes
-      tonConnectUI.onStatusChange(wallet => {
-        if (wallet) {
-          const address = wallet.account.address;
-          updateTonWalletUI(true, address);
-          localStorage.setItem('tonWalletAddress', address);
-          
-          // Save to Firebase
-          db.ref('users/' + userId).update({
-            ton: address
-          });
-        } else {
-          updateTonWalletUI(false);
-          localStorage.removeItem('tonWalletAddress');
-          
-          // Remove from Firebase
-          db.ref('users/' + userId).update({
-            ton: ""
-          });
-        }
-      });
-      
-      // Connect wallet button click handler
-      document.getElementById('tonConnectButton').addEventListener('click', async () => {
-        document.getElementById('tonConnectButton').innerHTML = '<span class="ton-loading"></span> Connecting...';
-        try {
-          await tonConnectUI.connectWallet();
-        } catch (error) {
-          console.error('Connection error:', error);
-          notify('Failed to connect wallet. Please try again.', 'error');
-          document.getElementById('tonConnectButton').innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/1791/1791330.png" alt="Connect" class="ton-button-icon"> Connect TON Wallet';
-        }
-      });
-      
-      // Disconnect wallet button click handler
-      document.getElementById('tonDisconnectButton').addEventListener('click', async () => {
-        document.getElementById('tonDisconnectButton').innerHTML = '<span class="ton-loading"></span> Disconnecting...';
-        try {
-          await tonConnectUI.disconnect();
-        } catch (error) {
-          console.error('Disconnection error:', error);
-          notify('Failed to disconnect wallet. Please try again.', 'error');
-          document.getElementById('tonDisconnectButton').innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="Disconnect" class="ton-button-icon"> Disconnect';
-        }
-      });
-    }
-    
-    // NEW: Update TON wallet UI based on connection status
-    function updateTonWalletUI(connected, address = '') {
-      if (connected) {
-        // Show wallet info and disconnect button
-        document.getElementById('tonWalletInfo').style.display = 'block';
-        document.getElementById('tonWalletAddress').textContent = address;
-        
-        // Hide connect button
-        document.getElementById('tonConnectButton').style.display = 'none';
-        
-        notify('Wallet connected successfully!', 'success');
-      } else {
-        // Hide wallet info and disconnect button
-        document.getElementById('tonWalletInfo').style.display = 'none';
-        
-        // Show connect button
-        document.getElementById('tonConnectButton').style.display = 'flex';
-        document.getElementById('tonConnectButton').innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/1791/1791330.png" alt="Connect" class="ton-button-icon"> Connect TON Wallet';
-        
-        if (address === '') {
-          notify('Wallet disconnected', 'info');
-        }
-      }
-    }
-    
-    // NEW: Copy TON wallet address to clipboard
-    function copyTonAddress() {
-      const address = document.getElementById('tonWalletAddress').textContent;
-      navigator.clipboard.writeText(address).then(() => {
-        notify('Address copied to clipboard!', 'success');
-      }).catch(() => {
-        notify('Failed to copy address', 'error');
-      });
-    }
-    
-    // NEW: Show TON error message
-    function showTonError(message) {
-      const errorEl = document.getElementById('tonErrorMessage');
-      errorEl.textContent = message;
-      errorEl.style.display = 'block';
-    }
-    
-    // NEW: Hide TON error message
-    function hideTonError() {
-      document.getElementById('tonErrorMessage').style.display = 'none';
     }
     
     function loadProfileSections() {
@@ -4668,19 +4651,6 @@
             ${message.text ? `<div class="message-text">${message.text}</div>` : ''}
             ${message.image ? `<img src="${message.image}" class="message-image" alt="Image" />` : ''}
             ${reactionsHTML ? `<div class="message-reactions">${reactionsHTML}</div>` : ''}
-            
-            ${(isAdmin || isModerator) ? `
-              <div class="message-actions">
-                <button class="action-btn delete" data-message-id="${message.id}" title="Delete">
-                  🗑️
-                </button>
-                ${!isOwn ? `
-                  <button class="action-btn restrict" data-user-id="${message.userId}" data-user-name="${message.userName}" data-user-avatar="${message.userAvatar}" title="Restrict User">
-                    🔒
-                  </button>
-                ` : ''}
-              </div>
-            ` : ''}
           </div>
         </div>
       `;
@@ -4699,29 +4669,6 @@
         imageEl.addEventListener('click', () => {
           window.open(imageEl.src, '_blank');
         });
-      }
-      
-      // Add event listener for delete button (admin/moderator only)
-      if (isAdmin || isModerator) {
-        const deleteBtn = messageEl.querySelector('.action-btn.delete');
-        if (deleteBtn) {
-          deleteBtn.addEventListener('click', () => {
-            const messageId = deleteBtn.dataset.messageId;
-            deleteMessage(messageId);
-          });
-        }
-        
-        // Add event listener for restrict button (admin/moderator only, not for own messages)
-        const restrictBtn = messageEl.querySelector('.action-btn.restrict');
-        if (restrictBtn) {
-          restrictBtn.addEventListener('click', () => {
-            const restrictUserId = restrictBtn.dataset.userId;
-            const restrictUserName = restrictBtn.dataset.userName;
-            const restrictUserAvatar = restrictBtn.dataset.userAvatar;
-            
-            showRestrictionModal(restrictUserId, restrictUserName, restrictUserAvatar);
-          });
-        }
       }
       
       return messageEl;
@@ -4750,15 +4697,6 @@
           reactionRef.set(users);
         }
       });
-    }
-    
-    function deleteMessage(messageId) {
-      if (!isAdmin && !isModerator) return;
-      
-      if (confirm('Are you sure you want to delete this message?')) {
-        db.ref('chat/messages/' + messageId).remove();
-        notify('Message deleted');
-      }
     }
     
     function renderTypingIndicators() {
