@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,maximum-scale=1" />
+  <title>Monetag Ads Integration</title>
+  
+  <!-- Monetag SDK -->
+  <script src="//libtl.com/sdk.js" data-zone="9970324" data-sdk="show_9970324"></script>
+  
+  <style>
+    .ad-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+    
+    .ad-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+    
+    .ad-reward {
+      font-size: 14px;
+      color: #4ECDC4;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #6B73FF 0%, #4ECDC4 100%);
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(107, 115, 255, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(107, 115, 255, 0.4);
+    }
+    
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+    
+    .btn-primary:disabled {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.4);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="ad-card">
+    <div class="ad-title">Watch Advertisement</div>
+    <div class="ad-reward">Earn 500 SHB per ad</div>
+    <button class="btn-primary" id="showAdBtn">
+      Watch Ad
+    </button>
+  </div>
+
+  <script>
+    // Ad Statistics Tracking
+    let adStats = { 
+      today: 0, 
+      yesterday: 0, 
+      thisWeek: 0, 
+      thisMonth: 0, 
+      lifetime: 0,
+      lastAdDate: null,
+      lastWeekReset: null,
+      lastMonthReset: null
+    };
+    
+    let coinsEarned = 0;
+    let adLoading = false;
+    
+    // Utility Functions
+    function now() {
+      return Math.floor(Date.now() / 1000);
+    }
+    
+    function getToday() {
+      const date = new Date();
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }
+    
+    function getWeekStart() {
+      const date = new Date();
+      const day = date.getDay();
+      const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+      date.setDate(diff);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }
+    
+    function getMonthStart() {
+      const date = new Date();
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`;
+    }
+    
+    function notify(message, duration = 2500) {
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      notification.textContent = message;
+      notification.style.position = 'fixed';
+      notification.style.top = '20px';
+      notification.style.left = '50%';
+      notification.style.transform = 'translateX(-50%)';
+      notification.style.background = 'linear-gradient(135deg, #6B73FF 0%, #4ECDC4 100%)';
+      notification.style.color = '#fff';
+      notification.style.padding = '16px 32px';
+      notification.style.borderRadius = '12px';
+      notification.style.fontSize = '14px';
+      notification.style.fontWeight = '600';
+      notification.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)';
+      notification.style.zIndex = '10000';
+      notification.style.maxWidth = '90%';
+      notification.style.textAlign = 'center';
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, duration);
+    }
+    
+    function resetAdStatsIfNeeded() {
+      const today = getToday();
+      const weekStart = getWeekStart();
+      const monthStart = getMonthStart();
+      
+      if (adStats.lastAdDate !== today) {
+        adStats.yesterday = adStats.today;
+        adStats.today = 0;
+        adStats.lastAdDate = today;
+      }
+      
+      if (adStats.lastWeekReset !== weekStart) {
+        adStats.thisWeek = 0;
+        adStats.lastWeekReset = weekStart;
+      }
+      
+      if (adStats.lastMonthReset !== monthStart) {
+        adStats.thisMonth = 0;
+        adStats.lastMonthReset = monthStart;
+      }
+    }
+    
+    // Award Referral Commission (for ad earnings)
+    function awardReferralCommission(earnedAmount) {
+      // This function would be implemented based on your referral system
+      // It's a placeholder to show where referral commission would be awarded
+      console.log(`Awarding referral commission for ${earnedAmount} SHB earned from ads`);
+    }
+    
+    // Initialize Ad Button
+    document.getElementById('showAdBtn').addEventListener('click', () => {
+      if (adLoading) return;
+      
+      adLoading = true;
+      document.getElementById('showAdBtn').textContent = 'Loading...';
+      
+      if (typeof show_9970324 === 'function') {
+        show_9970324().then(() => {
+          adLoading = false;
+          document.getElementById('showAdBtn').textContent = 'Watch Ad';
+          
+          const adReward = 500;
+          coinsEarned += adReward;
+          
+          // Award referral commission for ad watching
+          awardReferralCommission(adReward);
+          
+          adStats.today++;
+          adStats.thisWeek++;
+          adStats.thisMonth++;
+          adStats.lifetime++;
+          adStats.lastAdDate = getToday();
+          
+          notify('Earned 500 SHB for watching ad!');
+          
+          // Here you would typically update the UI and save to database
+          console.log('Ad stats updated:', adStats);
+          console.log('New balance:', coinsEarned);
+        }).catch(() => {
+          adLoading = false;
+          document.getElementById('showAdBtn').textContent = 'Watch Ad';
+          notify('Ad failed to load. Please try again.');
+        });
+      } else {
+        adLoading = false;
+        document.getElementById('showAdBtn').textContent = 'Watch Ad';
+        notify('Ad service not available.');
+      }
+    });
+    
+    // Initialize ad stats
+    resetAdStatsIfNeeded();
+  </script>
+</body>
+</html>
