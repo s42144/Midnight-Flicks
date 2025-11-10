@@ -1,229 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,maximum-scale=1" />
-  <title>Telegram API Integration</title>
-  
-  <!-- Telegram WebApp SDK -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  
-  <style>
-    body {
-      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1A1A2E 0%, #16213E 30%, #0F3460 70%, #533483 100%);
-      color: #ffffff;
-      padding: 20px;
-      min-height: 100vh;
-    }
-    
-    .user-card {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(20px);
-      border-radius: 20px;
-      padding: 24px;
-      margin-bottom: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-      text-align: center;
-    }
-    
-    .user-avatar {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      margin: 0 auto 16px;
-      border: 4px solid #4ECDC4;
-      object-fit: cover;
-    }
-    
-    .user-name {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    
-    .user-id {
-      font-size: 16px;
-      color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 16px;
-    }
-    
-    .user-details {
-      text-align: left;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 12px;
-      padding: 16px;
-      margin-top: 16px;
-    }
-    
-    .detail-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-    
-    .detail-label {
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.7);
-    }
-    
-    .detail-value {
-      color: #4ECDC4;
-    }
-    
-    .btn-primary {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #6B73FF 0%, #4ECDC4 100%);
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(107, 115, 255, 0.3);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-top: 16px;
-    }
-    
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(107, 115, 255, 0.4);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram API Integration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-right: 20px;
+        }
+        button {
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #0077b3;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #0088cc;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+        }
+        .data-display {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid #0088cc;
+        }
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 136, 204, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #0088cc;
+            animation: spin 1s ease infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-  <div class="user-card">
-    <img id="userAvatar" class="user-avatar" src="https://via.placeholder.com/120" alt="User Avatar" />
-    <div id="userName" class="user-name">Loading...</div>
-    <div id="userId" class="user-id">ID: ...</div>
-    
-    <div class="user-details">
-      <div class="detail-row">
-        <span class="detail-label">Username:</span>
-        <span id="userUsername" class="detail-value">...</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Language:</span>
-        <span id="userLanguage" class="detail-value">...</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Theme:</span>
-        <span id="userTheme" class="detail-value">...</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Platform:</span>
-        <span id="userPlatform" class="detail-value">...</span>
-      </div>
+    <div class="container">
+        <h1>Telegram API Integration Demo</h1>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Initializing Telegram WebApp...</p>
+        </div>
+        
+        <div id="userContainer" style="display: none;">
+            <div class="user-info">
+                <img id="userAvatar" class="user-avatar" src="" alt="User Avatar">
+                <div>
+                    <h2 id="userName">User Name</h2>
+                    <p id="userId">User ID: </p>
+                    <p id="userUsername">@username</p>
+                </div>
+            </div>
+            
+            <div class="data-display">
+                <h3>WebApp Data</h3>
+                <pre id="initData"></pre>
+            </div>
+            
+            <div class="data-display">
+                <h3>Start Parameter</h3>
+                <p id="startParam">No start parameter</p>
+            </div>
+            
+            <button id="expandBtn">Expand WebApp</button>
+            <button id="readyBtn">Mark WebApp as Ready</button>
+            <button id="closeBtn">Close WebApp</button>
+            <button id="shareBtn">Share with Friends</button>
+        </div>
     </div>
     
-    <button id="expandBtn" class="btn-primary">Expand Web App</button>
-  </div>
-
-  <script>
-    // Initialize Telegram WebApp
-    const tg = window.Telegram.WebApp;
+    <div id="notification" class="notification"></div>
     
-    // User data
-    let userId = null;
-    let userName = null;
-    let userAvatar = null;
-    let userUsername = null;
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
-    // Utility Functions
-    function notify(message, duration = 2500) {
-      const notification = document.createElement('div');
-      notification.className = 'notification';
-      notification.textContent = message;
-      notification.style.position = 'fixed';
-      notification.style.top = '20px';
-      notification.style.left = '50%';
-      notification.style.transform = 'translateX(-50%)';
-      notification.style.background = 'linear-gradient(135deg, #6B73FF 0%, #4ECDC4 100%)';
-      notification.style.color = '#fff';
-      notification.style.padding = '16px 32px';
-      notification.style.borderRadius = '12px';
-      notification.style.fontSize = '14px';
-      notification.style.fontWeight = '600';
-      notification.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)';
-      notification.style.zIndex = '10000';
-      notification.style.maxWidth = '90%';
-      notification.style.textAlign = 'center';
-      
-      document.body.appendChild(notification);
-      
-      setTimeout(() => {
-        notification.remove();
-      }, duration);
-    }
-    
-    // Get Telegram User Data
-    function getTelegramUserData() {
-      tg.expand();
-      tg.ready();
-      
-      const user = tg.initDataUnsafe?.user;
-      
-      if (user && user.id) {
-        userId = user.id.toString();
-        userName = user.first_name + (user.last_name ? ' ' + user.last_name : '');
-        userUsername = user.username || 'Not set';
+    <script>
+        // Global variables
+        let tg;
+        let userId = null;
+        let userName = null;
+        let userAvatar = null;
         
-        if (user.photo_url) {
-          userAvatar = user.photo_url;
-        } else {
-          userAvatar = "https://via.placeholder.com/120";
+        function notify(message, duration = 2500) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, duration);
         }
         
-        // Update UI
-        document.getElementById('userAvatar').src = userAvatar;
-        document.getElementById('userName').textContent = userName;
-        document.getElementById('userId').textContent = 'ID: ' + userId;
-        document.getElementById('userUsername').textContent = userUsername;
-        document.getElementById('userLanguage').textContent = tg.initDataUnsafe?.user?.language_code || 'Unknown';
-        document.getElementById('userTheme').textContent = tg.colorScheme || 'Unknown';
-        document.getElementById('userPlatform').textContent = tg.platform || 'Unknown';
+        function initializeTelegramWebApp() {
+            // Check if Telegram WebApp is available
+            if (!window.Telegram || !window.Telegram.WebApp) {
+                document.getElementById('loading').innerHTML = '<p>Telegram WebApp SDK not available. Running outside Telegram environment.</p>';
+                
+                // Create mock user data for testing
+                userId = 'test_' + Math.floor(10000 + Math.random() * 89999).toString();
+                userName = 'Test User';
+                userAvatar = "https://github.com/akhterefti-del/Shark/blob/76091d5ce35c6707100f0269223352d0b5c1a163/Gemini_Generated_Image_ad2lr0ad2lr0ad2l.png?raw=true";
+                
+                displayUserData();
+                return;
+            }
+            
+            // Initialize Telegram WebApp
+            tg = window.Telegram.WebApp;
+            
+            // Expand the WebApp
+            tg.expand();
+            
+            // Mark WebApp as ready
+            tg.ready();
+            
+            // Get user data
+            const user = tg.initDataUnsafe?.user;
+            
+            if (user && user.id) {
+                userId = user.id.toString();
+                userName = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+                
+                if (user.photo_url) {
+                    userAvatar = user.photo_url;
+                } else {
+                    userAvatar = "https://github.com/akhterefti-del/Shark/blob/76091d5ce35c6707100f0269223352d0b5c1a163/Gemini_Generated_Image_ad2lr0ad2lr0ad2l.png?raw=true";
+                }
+                
+                // Display user data
+                displayUserData();
+                
+                // Get start parameter
+                const startParam = tg.initDataUnsafe?.start_param;
+                if (startParam) {
+                    document.getElementById('startParam').textContent = startParam;
+                }
+                
+                // Display init data
+                document.getElementById('initData').textContent = JSON.stringify(tg.initDataUnsafe, null, 2);
+                
+                notify('Telegram WebApp initialized successfully!');
+            } else {
+                document.getElementById('loading').innerHTML = '<p>Failed to get user data from Telegram.</p>';
+            }
+        }
         
-        console.log('Telegram User ID:', userId);
-        console.log('Telegram User Name:', userName);
-        console.log('Telegram Username:', userUsername);
+        function displayUserData() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('userContainer').style.display = 'block';
+            
+            document.getElementById('userAvatar').src = userAvatar;
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('userId').textContent = 'User ID: ' + userId;
+            
+            // If running outside Telegram, use mock data
+            if (!tg) {
+                document.getElementById('userUsername').textContent = '@testuser';
+                document.getElementById('initData').textContent = JSON.stringify({
+                    user: {
+                        id: userId,
+                        first_name: userName,
+                        photo_url: userAvatar
+                    },
+                    query_id: "test_query_id",
+                    auth_date: Math.floor(Date.now() / 1000)
+                }, null, 2);
+            }
+        }
         
-        return true;
-      }
-      
-      console.warn('Running outside Telegram environment - using test user');
-      userId = 'test_' + Math.floor(10000 + Math.random() * 89999).toString();
-      userName = 'Test User';
-      userUsername = 'testuser';
-      userAvatar = "https://via.placeholder.com/120";
-      
-      // Update UI
-      document.getElementById('userAvatar').src = userAvatar;
-      document.getElementById('userName').textContent = userName;
-      document.getElementById('userId').textContent = 'ID: ' + userId;
-      document.getElementById('userUsername').textContent = userUsername;
-      document.getElementById('userLanguage').textContent = 'Unknown';
-      document.getElementById('userTheme').textContent = 'Unknown';
-      document.getElementById('userPlatform').textContent = 'Unknown';
-      
-      return true;
-    }
-    
-    // Expand Web App
-    document.getElementById('expandBtn').addEventListener('click', () => {
-      tg.expand();
-      notify('Web App expanded!');
-    });
-    
-    // Initialize
-    if (getTelegramUserData()) {
-      notify('Telegram API initialized successfully!');
-    } else {
-      notify('Failed to initialize Telegram API');
-    }
-  </script>
+        // Event listeners
+        document.getElementById('expandBtn').addEventListener('click', function() {
+            if (tg) {
+                tg.expand();
+                notify('WebApp expanded!');
+            } else {
+                notify('Telegram WebApp not available');
+            }
+        });
+        
+        document.getElementById('readyBtn').addEventListener('click', function() {
+            if (tg) {
+                tg.ready();
+                notify('WebApp marked as ready!');
+            } else {
+                notify('Telegram WebApp not available');
+            }
+        });
+        
+        document.getElementById('closeBtn').addEventListener('click', function() {
+            if (tg) {
+                tg.close();
+                notify('WebApp closed!');
+            } else {
+                notify('Telegram WebApp not available');
+            }
+        });
+        
+        document.getElementById('shareBtn').addEventListener('click', function() {
+            if (tg) {
+                const shareUrl = 'https://t.me/YourBotName?startapp=' + userId;
+                tg.openTelegramLink(shareUrl);
+                notify('Share link opened!');
+            } else {
+                notify('Telegram WebApp not available');
+            }
+        });
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initializeTelegramWebApp);
+    </script>
 </body>
 </html>
