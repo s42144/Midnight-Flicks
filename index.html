@@ -3,2448 +3,424 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WinArena - BTX Web3 Casino & Social Hub</title>
+    <title>WinArena - Telegram Mini App</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #6C5CE7;
-            --primary-dark: #5A4AD8;
-            --secondary: #00B894;
-            --accent: #FDCB6E;
-            --danger: #FF6B6B;
-            --dark: #2D3436;
-            --light: #F5F7FA;
-            --white: #FFFFFF;
-            --gray: #636E72;
-            --success: #00D68F;
-            --warning: #FFAA00;
-            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--light);
-            color: var(--dark);
-            overflow-x: hidden;
-            padding-bottom: 70px;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 100%;
-            padding: 0 15px;
-            margin: 0 auto;
-        }
-
-        /* Header Styles */
-        .header {
-            background: var(--gradient);
-            color: white;
-            padding: 15px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 22px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .balance-box {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 8px 15px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 600;
-        }
-
-        .balance-box i {
-            color: var(--accent);
-        }
-
-        .ton-wallet-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* Navigation Styles */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            z-index: 1000;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            color: var(--gray);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 5px 10px;
-            border-radius: 10px;
-        }
-
-        .nav-item.active {
-            color: var(--primary);
-        }
-
-        .nav-item i {
-            font-size: 20px;
-        }
-
-        .nav-item span {
-            font-size: 11px;
-            font-weight: 500;
-        }
-
-        /* Content Sections */
-        .content-section {
-            display: none;
-            padding: 20px 0;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .content-section.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Home Section */
-        .search-bar {
-            background: white;
-            border-radius: 15px;
-            padding: 12px 15px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: var(--shadow);
-        }
-
-        .search-bar input {
-            border: none;
-            outline: none;
-            flex: 1;
-            font-size: 14px;
-        }
-
-        .categories {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            padding-bottom: 5px;
-        }
-
-        .category-chip {
-            background: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            white-space: nowrap;
-            box-shadow: var(--shadow);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .category-chip.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        .game-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .game-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .game-thumbnail {
-            height: 120px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-        }
-
-        .game-info {
-            padding: 12px;
-        }
-
-        .game-name {
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-
-        .game-stats {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: var(--gray);
-        }
-
-        /* Discover Section */
-        .post-creator {
-            background: white;
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-        }
-
-        .post-input {
-            width: 100%;
-            border: none;
-            outline: none;
-            padding: 10px;
-            font-size: 14px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            background: var(--light);
-        }
-
-        .post-actions {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .post-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .post-btn:hover {
-            background: var(--primary-dark);
-        }
-
-        .feed {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .post {
-            background: white;
-            border-radius: 15px;
-            padding: 15px;
-            box-shadow: var(--shadow);
-        }
-
-        .post-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-
-        .user-info {
-            flex: 1;
-        }
-
-        .user-name {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .post-time {
-            font-size: 12px;
-            color: var(--gray);
-        }
-
-        .post-content {
-            margin-bottom: 10px;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .post-image {
-            width: 100%;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-
-        .post-footer {
-            display: flex;
-            gap: 15px;
-        }
-
-        .post-action {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 14px;
-            color: var(--gray);
-            cursor: pointer;
-        }
-
-        .post-action.liked {
-            color: var(--danger);
-        }
-
-        /* Wallet Section */
-        .wallet-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .wallet-tab {
-            flex: 1;
-            padding: 12px;
-            text-align: center;
-            background: white;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow);
-        }
-
-        .wallet-tab.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .wallet-content {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-        }
-
-        .wallet-tab-content {
-            display: none;
-        }
-
-        .wallet-tab-content.active {
-            display: block;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #E0E0E0;
-            border-radius: 10px;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .form-input:focus {
-            border-color: var(--primary);
-        }
-
-        .exchange-info {
-            background: var(--light);
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
-        .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            font-size: 14px;
-        }
-
-        .btn:hover {
-            background: var(--primary-dark);
-        }
-
-        .btn-secondary {
-            background: var(--secondary);
-        }
-
-        .btn-secondary:hover {
-            background: #00A884;
-        }
-
-        .transaction-history {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .transaction-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px;
-            background: var(--light);
-            border-radius: 10px;
-            font-size: 14px;
-        }
-
-        .transaction-type {
-            font-weight: 600;
-        }
-
-        .transaction-amount {
-            font-weight: 600;
-        }
-
-        .transaction-amount.positive {
-            color: var(--success);
-        }
-
-        .transaction-amount.negative {
-            color: var(--danger);
-        }
-
-        /* Earn Section */
-        .earn-cards {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .earn-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .earn-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .earn-card i {
-            font-size: 30px;
-            margin-bottom: 10px;
-            color: var(--primary);
-        }
-
-        .earn-card-title {
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-
-        .earn-card-desc {
-            font-size: 12px;
-            color: var(--gray);
-        }
-
-        .tasks-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .task-item {
-            background: white;
-            border-radius: 15px;
-            padding: 15px;
-            box-shadow: var(--shadow);
-            display: flex;
-            gap: 15px;
-        }
-
-        .task-icon {
-            width: 50px;
-            height: 50px;
-            background: var(--light);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            font-size: 20px;
-        }
-
-        .task-info {
-            flex: 1;
-        }
-
-        .task-title {
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-
-        .task-desc {
-            font-size: 12px;
-            color: var(--gray);
-            margin-bottom: 5px;
-        }
-
-        .task-reward {
-            font-size: 12px;
-            color: var(--success);
-            font-weight: 600;
-        }
-
-        .task-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: 500;
-            cursor: pointer;
-            font-size: 12px;
-            align-self: center;
-        }
-
-        .task-btn.completed {
-            background: var(--gray);
-        }
-
-        /* Referral Section */
-        .referral-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
-        }
-
-        .referral-link-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .referral-link {
-            flex: 1;
-            padding: 10px;
-            background: var(--light);
-            border-radius: 10px;
-            font-size: 12px;
-            word-break: break-all;
-        }
-
-        .copy-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .referral-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-box {
-            background: var(--light);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: var(--gray);
-        }
-
-        .referrals-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .referral-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            background: var(--light);
-            border-radius: 10px;
-        }
-
-        .referral-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-
-        .referral-info {
-            flex: 1;
-        }
-
-        .referral-name {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .referral-earning {
-            font-size: 12px;
-            color: var(--success);
-        }
-
-        /* Profile Section */
-        .profile-header {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: var(--gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 30px;
-            font-weight: 600;
-        }
-
-        .profile-info {
-            flex: 1;
-        }
-
-        .profile-name {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .profile-id {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 14px;
-            color: var(--gray);
-        }
-
-        .profile-id i {
-            cursor: pointer;
-            color: var(--primary);
-        }
-
-        .profile-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .profile-stat {
-            text-align: center;
-        }
-
-        .profile-stat-value {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .profile-stat-label {
-            font-size: 12px;
-            color: var(--gray);
-        }
-
-        .settings-list {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-        }
-
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid var(--light);
-        }
-
-        .setting-item:last-child {
-            border-bottom: none;
-        }
-
-        .setting-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .setting-label i {
-            color: var(--primary);
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 50px;
-            height: 26px;
-            background: var(--gray);
-            border-radius: 13px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .toggle-switch.active {
-            background: var(--primary);
-        }
-
-        .toggle-switch::after {
-            content: '';
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-
-        .toggle-switch.active::after {
-            left: 27px;
-        }
-
-        /* Daily Check-in Modal */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            display: none;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            width: 90%;
-            max-width: 400px;
-            position: relative;
-            animation: modalSlideIn 0.3s ease;
-        }
-
-        @keyframes modalSlideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            color: var(--gray);
-        }
-
-        .checkin-title {
-            text-align: center;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--primary);
-        }
-
-        .checkin-days {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .checkin-day {
-            text-align: center;
-            padding: 10px 5px;
-            border-radius: 10px;
-            background: var(--light);
-            font-size: 12px;
-        }
-
-        .checkin-day.completed {
-            background: var(--success);
-            color: white;
-        }
-
-        .checkin-day.today {
-            background: var(--primary);
-            color: white;
-            font-weight: 600;
-        }
-
-        .checkin-reward {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .reward-amount {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .reward-label {
-            font-size: 14px;
-            color: var(--gray);
-        }
-
-        .checkin-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            font-size: 16px;
-        }
-
-        /* Notification Toast */
-        .toast {
-            position: fixed;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--dark);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 30px;
-            font-size: 14px;
-            z-index: 2000;
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .toast.show {
-            opacity: 1;
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 3px solid white;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 480px) {
-            .games-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .earn-cards {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <i class="fas fa-dice"></i>
-                    <span>WinArena</span>
+    <div id="app">
+        <!-- Daily Check-in Modal -->
+        <div id="dailyCheckInModal" class="modal">
+            <div class="modal-content">
+                <div class="checkin-header">
+                    <h2>Daily Check-in!</h2>
+                    <button class="close-btn" onclick="closeDailyCheckIn()">&times;</button>
                 </div>
-                <div class="balance-box">
-                    <i class="fas fa-coins"></i>
-                    <span id="userBalance">0 BTX</span>
+                <div class="checkin-content">
+                    <div class="checkin-progress">
+                        <div class="day-streak">
+                            <div class="day" data-day="1">1</div>
+                            <div class="day" data-day="2">2</div>
+                            <div class="day" data-day="3">3</div>
+                            <div class="day" data-day="4">4</div>
+                            <div class="day" data-day="5">5</div>
+                            <div class="day" data-day="6">6</div>
+                            <div class="day" data-day="7">7</div>
+                        </div>
+                    </div>
+                    <div class="reward-info">
+                        <h3 id="checkinReward">Today's Reward: 1 BTX</h3>
+                        <p>Keep your streak alive!</p>
+                    </div>
+                    <button class="claim-btn" onclick="claimDailyReward()">Claim Reward</button>
                 </div>
-                <button class="ton-wallet-btn" id="connectWalletBtn">
-                    <i class="fas fa-wallet"></i>
-                    <span id="walletBtnText">Connect TON</span>
-                </button>
             </div>
         </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="container">
-        <!-- Home Section -->
-        <section id="home" class="content-section active">
-            <div class="search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Search games..." id="gameSearch">
-            </div>
-            
-            <div class="categories">
-                <div class="category-chip active" data-category="all">All Games</div>
-                <div class="category-chip" data-category="slots">Slots</div>
-                <div class="category-chip" data-category="card">Card Games</div>
-                <div class="category-chip" data-category="roulette">Roulette</div>
-                <div class="category-chip" data-category="new">New</div>
-            </div>
-            
-            <div class="games-grid" id="gamesGrid">
-                <!-- Games will be loaded here -->
-            </div>
-        </section>
-
-        <!-- Discover Section -->
-        <section id="discover" class="content-section">
-            <div class="post-creator">
-                <textarea class="post-input" placeholder="What's on your mind?" id="postInput"></textarea>
-                <div class="post-actions">
-                    <button class="post-btn" id="uploadImageBtn">
-                        <i class="fas fa-image"></i> Image
-                    </button>
-                    <button class="post-btn" id="createPostBtn">
-                        <i class="fas fa-paper-plane"></i> Post
-                    </button>
-                </div>
-            </div>
-            
-            <div class="feed" id="socialFeed">
-                <!-- Posts will be loaded here -->
-            </div>
-        </section>
-
-        <!-- Wallet Section -->
-        <section id="wallet" class="content-section">
-            <div class="wallet-tabs">
-                <div class="wallet-tab active" data-tab="deposit">Deposit</div>
-                <div class="wallet-tab" data-tab="withdraw">Withdraw</div>
-                <div class="wallet-tab" data-tab="history">History</div>
-            </div>
-            
-            <div class="wallet-content">
-                <!-- Deposit Tab -->
-                <div class="wallet-tab-content active" id="depositTab">
-                    <div class="exchange-info">
-                        <strong>Exchange Rate:</strong> 1 TON = 500 BTX
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Amount (TON)</label>
-                        <input type="number" class="form-input" id="depositAmount" placeholder="Minimum: 1 TON" min="1" step="0.01">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">You will receive</label>
-                        <div class="form-input" id="btxReceive">0 BTX</div>
-                    </div>
-                    
-                    <button class="btn" id="depositBtn">Deposit Now</button>
-                </div>
-                
-                <!-- Withdraw Tab -->
-                <div class="wallet-tab-content" id="withdrawTab">
-                    <div class="form-group">
-                        <label class="form-label">Amount (BTX)</label>
-                        <input type="number" class="form-input" id="withdrawAmount" placeholder="Minimum: 250 BTX" min="250">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">TON Wallet Address</label>
-                        <input type="text" class="form-input" id="withdrawAddress" placeholder="Your TON wallet address">
-                    </div>
-                    
-                    <button class="btn btn-secondary" id="withdrawBtn">Withdraw Now</button>
-                </div>
-                
-                <!-- History Tab -->
-                <div class="wallet-tab-content" id="historyTab">
-                    <div class="transaction-history" id="transactionHistory">
-                        <!-- Transactions will be loaded here -->
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Earn Section -->
-        <section id="earn" class="content-section">
-            <div class="earn-cards">
-                <div class="earn-card" id="watchAdsCard">
-                    <i class="fas fa-ad"></i>
-                    <div class="earn-card-title">Watch Ads</div>
-                    <div class="earn-card-desc">0.10 BTX per ad</div>
-                </div>
-                
-                <div class="earn-card" id="referralCard">
-                    <i class="fas fa-user-friends"></i>
-                    <div class="earn-card-title">Referrals</div>
-                    <div class="earn-card-desc">20% commission</div>
-                </div>
-                
-                <div class="earn-card" id="dailyCheckinCard">
-                    <i class="fas fa-calendar-check"></i>
-                    <div class="earn-card-title">Daily Check-in</div>
-                    <div class="earn-card-desc">Up to 7 BTX</div>
-                </div>
-                
-                <div class="earn-card" id="luckySpinCard">
-                    <i class="fas fa-dice"></i>
-                    <div class="earn-card-title">Lucky Spin</div>
-                    <div class="earn-card-desc">Free daily spin</div>
-                </div>
-            </div>
-            
-            <h3 style="margin-bottom: 15px; font-size: 18px;">Tasks</h3>
-            <div class="tasks-list" id="tasksList">
-                <!-- Tasks will be loaded here -->
-            </div>
-        </section>
-
-        <!-- Profile Section -->
-        <section id="profile" class="content-section">
-            <div class="profile-header">
-                <div class="profile-avatar" id="profileAvatar">U</div>
-                <div class="profile-info">
-                    <div class="profile-name" id="profileName">User</div>
-                    <div class="profile-id">
-                        <span id="profileId">123456789</span>
-                        <i class="fas fa-copy" id="copyIdBtn"></i>
-                    </div>
-                    
-                    <div class="profile-stats">
-                        <div class="profile-stat">
-                            <div class="profile-stat-value" id="totalWinnings">0</div>
-                            <div class="profile-stat-label">Winnings</div>
-                        </div>
-                        <div class="profile-stat">
-                            <div class="profile-stat-value" id="totalReferrals">0</div>
-                            <div class="profile-stat-label">Referrals</div>
-                        </div>
-                        <div class="profile-stat">
-                            <div class="profile-stat-value" id="userLevel">1</div>
-                            <div class="profile-stat-label">Level</div>
+        <!-- Main Content Container -->
+        <div class="main-container">
+            <!-- Home Screen -->
+            <div id="homeScreen" class="screen active">
+                <div class="header">
+                    <h1>WinArena</h1>
+                    <div class="user-info">
+                        <img id="userAvatar" src="" alt="User">
+                        <div class="balance-display">
+                            <i class="fas fa-coins"></i>
+                            <span id="userBalance">0</span> BTX
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="settings-list">
-                <div class="setting-item">
-                    <div class="setting-label">
-                        <i class="fas fa-volume-up"></i>
-                        <span>Sound Effects</span>
-                    </div>
-                    <div class="toggle-switch active" id="soundToggle"></div>
-                </div>
                 
-                <div class="setting-item">
-                    <div class="setting-label">
-                        <i class="fas fa-bell"></i>
-                        <span>Notifications</span>
+                <div class="search-section">
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="gameSearch" placeholder="Search games...">
                     </div>
-                    <div class="toggle-switch active" id="notificationToggle"></div>
                 </div>
-                
-                <div class="setting-item">
-                    <div class="setting-label">
-                        <i class="fas fa-moon"></i>
-                        <span>Dark Mode</span>
+
+                <div class="category-section">
+                    <h3>Categories</h3>
+                    <div class="category-filters">
+                        <button class="category-btn active" data-category="all">All</button>
+                        <button class="category-btn" data-category="action">Action</button>
+                        <button class="category-btn" data-category="puzzle">Puzzle</button>
+                        <button class="category-btn" data-category="strategy">Strategy</button>
+                        <button class="category-btn" data-category="casual">Casual</button>
                     </div>
-                    <div class="toggle-switch" id="darkModeToggle"></div>
                 </div>
-                
-                <div class="setting-item">
-                    <div class="setting-label">
-                        <i class="fas fa-language"></i>
-                        <span>Language</span>
-                    </div>
-                    <select id="languageSelect" style="border: none; outline: none; background: transparent;">
-                        <option value="en">English</option>
-                        <option value="bn">বাংলা</option>
+
+                <div class="sort-section">
+                    <select id="sortGames">
+                        <option value="top">Top Rated</option>
+                        <option value="new">New</option>
+                        <option value="trending">Trending</option>
                     </select>
                 </div>
-                
-                <div class="setting-item">
-                    <div class="setting-label">
-                        <i class="fas fa-trash-alt"></i>
-                        <span>Delete Account</span>
-                    </div>
-                    <button class="btn" style="background: var(--danger); width: auto; padding: 8px 15px; font-size: 12px;">Delete</button>
+
+                <div class="games-grid" id="gamesList">
+                    <!-- Games will be dynamically loaded here -->
                 </div>
             </div>
-        </section>
-    </main>
 
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-        <div class="nav-item active" data-section="home">
-            <i class="fas fa-home"></i>
-            <span>Home</span>
-        </div>
-        <div class="nav-item" data-section="discover">
-            <i class="fas fa-compass"></i>
-            <span>Discover</span>
-        </div>
-        <div class="nav-item" data-section="wallet">
-            <i class="fas fa-wallet"></i>
-            <span>Wallet</span>
-        </div>
-        <div class="nav-item" data-section="earn">
-            <i class="fas fa-coins"></i>
-            <span>Earn</span>
-        </div>
-        <div class="nav-item" data-section="profile">
-            <i class="fas fa-user"></i>
-            <span>Profile</span>
-        </div>
-    </nav>
+            <!-- Discover Screen -->
+            <div id="discoverScreen" class="screen">
+                <div class="header">
+                    <h1>Discover</h1>
+                    <button class="create-post-btn" onclick="showCreatePost()">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                
+                <div class="posts-container" id="postsContainer">
+                    <!-- Posts will be dynamically loaded here -->
+                </div>
+            </div>
 
-    <!-- Daily Check-in Modal -->
-    <div class="modal" id="checkinModal">
-        <div class="modal-content">
-            <button class="modal-close" id="closeModalBtn">
-                <i class="fas fa-times"></i>
+            <!-- Wallet Screen -->
+            <div id="walletScreen" class="screen">
+                <div class="header">
+                    <h1>Wallet</h1>
+                    <div class="wallet-balance">
+                        <i class="fas fa-coins"></i>
+                        <span id="walletBalance">0</span> BTX
+                    </div>
+                </div>
+                
+                <div class="wallet-options">
+                    <button class="wallet-btn" onclick="showDeposit()">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>Deposit</span>
+                    </button>
+                    <button class="wallet-btn" onclick="showWithdraw()">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>Withdraw</span>
+                    </button>
+                    <button class="wallet-btn" onclick="showHistory()">
+                        <i class="fas fa-history"></i>
+                        <span>History</span>
+                    </button>
+                </div>
+
+                <div id="depositSection" class="wallet-section hidden">
+                    <h3>Deposit TON</h3>
+                    <p>1 TON = 500 BTX</p>
+                    <div class="input-group">
+                        <input type="number" id="depositAmount" placeholder="Enter TON amount" min="1" step="0.1">
+                        <div class="conversion-info">
+                            <span id="btxReceive">0 BTX</span>
+                        </div>
+                    </div>
+                    <button class="action-btn" onclick="confirmDeposit()">Confirm Deposit</button>
+                </div>
+
+                <div id="withdrawSection" class="wallet-section hidden">
+                    <h3>Withdraw BTX</h3>
+                    <p>Minimum: 250 BTX</p>
+                    <div class="input-group">
+                        <input type="number" id="withdrawAmount" placeholder="Enter BTX amount" min="250" step="10">
+                        <div class="wallet-status" id="walletStatus">
+                            <p>Connect TON wallet first</p>
+                        </div>
+                    </div>
+                    <button class="action-btn" onclick="confirmWithdraw()" id="withdrawBtn" disabled>Request Withdrawal</button>
+                </div>
+
+                <div id="historySection" class="wallet-section hidden">
+                    <h3>Transaction History</h3>
+                    <div class="history-filters">
+                        <select id="historyFilter">
+                            <option value="all">All</option>
+                            <option value="deposit">Deposits</option>
+                            <option value="withdraw">Withdrawals</option>
+                        </select>
+                    </div>
+                    <div class="history-list" id="historyList">
+                        <!-- History items will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Earn Screen -->
+            <div id="earnScreen" class="screen">
+                <div class="header">
+                    <h1>Earn</h1>
+                </div>
+                
+                <div class="earn-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-eye"></i>
+                        <div>
+                            <p>Today Watched</p>
+                            <span id="todayWatched">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-calendar-week"></i>
+                        <div>
+                            <p>This Week</p>
+                            <span id="weekWatched">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-trophy"></i>
+                        <div>
+                            <p>Lifetime</p>
+                            <span id="lifetimeWatched">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ads-section">
+                    <h3>Watch Ads & Earn</h3>
+                    <p>Watch ads to earn 0.10 BTX each</p>
+                    <button class="watch-ads-btn" onclick="watchAd()">
+                        <i class="fas fa-play"></i>
+                        Watch Ads
+                    </button>
+                    <div id="adsContainer" class="ads-container">
+                        <!-- Monetag ads will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="tasks-section">
+                    <h3>Complete Tasks</h3>
+                    <div class="tasks-container" id="tasksContainer">
+                        <!-- Tasks will be dynamically loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Referral Screen -->
+            <div id="referralScreen" class="screen">
+                <div class="header">
+                    <h1>Referrals</h1>
+                </div>
+                
+                <div class="referral-info">
+                    <div class="referral-link-box">
+                        <h3>Your Referral Link</h3>
+                        <div class="link-input-group">
+                            <input type="text" id="referralLink" readonly>
+                            <button onclick="copyReferralLink()">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="referral-stats">
+                        <div class="stat-item">
+                            <span>Total Referred</span>
+                            <strong id="totalReferred">0</strong>
+                        </div>
+                        <div class="stat-item">
+                            <span>Commission Earned</span>
+                            <strong id="commissionEarned">0 BTX</strong>
+                        </div>
+                        <div class="stat-item">
+                            <span>Active Referrals</span>
+                            <strong id="activeReferrals">0</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="leaderboard-section">
+                    <h3>Top Referrers (24h)</h3>
+                    <div class="leaderboard-list" id="leaderboardList">
+                        <!-- Leaderboard will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="referral-list-section">
+                    <h3>Your Referrals</h3>
+                    <div class="referral-list" id="referralList">
+                        <!-- Referral list will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Screen -->
+            <div id="profileScreen" class="screen">
+                <div class="header">
+                    <h1>Profile</h1>
+                </div>
+                
+                <div class="profile-info">
+                    <img id="profileAvatar" src="" alt="Profile">
+                    <h2 id="profileName">User</h2>
+                    <p>Telegram User</p>
+                    <div class="user-id-box">
+                        <span>ID: <strong id="userId"></strong></span>
+                        <button onclick="copyUserId()">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Settings</h3>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <i class="fas fa-volume-up"></i>
+                            <span>Sound</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="soundToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <i class="fas fa-wallet"></i>
+                            <span>TON Wallet</span>
+                        </div>
+                        <div class="wallet-actions">
+                            <button id="connectWalletBtn" onclick="connectTONWallet()">Connect</button>
+                            <button id="disconnectWalletBtn" onclick="disconnectTONWallet()" class="hidden">Disconnect</button>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <i class="fas fa-moon"></i>
+                            <span>Dark Mode</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="darkModeToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item danger">
+                        <div class="setting-info">
+                            <i class="fas fa-trash"></i>
+                            <span>Delete Account</span>
+                        </div>
+                        <button onclick="deleteAccount()" class="danger-btn">Delete</button>
+                    </div>
+                </div>
+
+                <div class="badges-section">
+                    <h3>Badges</h3>
+                    <div class="badges-container">
+                        <div class="badge" data-badge="new">
+                            <i class="fas fa-star"></i>
+                            <span>New</span>
+                        </div>
+                        <div class="badge" data-badge="active">
+                            <i class="fas fa-fire"></i>
+                            <span>Active</span>
+                        </div>
+                        <div class="badge" data-badge="pro">
+                            <i class="fas fa-crown"></i>
+                            <span>Pro</span>
+                        </div>
+                        <div class="badge" data-badge="influencer">
+                            <i class="fas fa-microphone"></i>
+                            <span>Influencer</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-screen="home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
             </button>
-            
-            <h2 class="checkin-title">Daily Check-in</h2>
-            
-            <div class="checkin-days" id="checkinDays">
-                <div class="checkin-day">Day 1<br>1 BTX</div>
-                <div class="checkin-day">Day 2<br>2 BTX</div>
-                <div class="checkin-day">Day 3<br>3 BTX</div>
-                <div class="checkin-day">Day 4<br>4 BTX</div>
-                <div class="checkin-day">Day 5<br>5 BTX</div>
-                <div class="checkin-day">Day 6<br>6 BTX</div>
-                <div class="checkin-day">Day 7<br>7 BTX</div>
+            <button class="nav-item" data-screen="discover">
+                <i class="fas fa-compass"></i>
+                <span>Discover</span>
+            </button>
+            <button class="nav-item" data-screen="wallet">
+                <i class="fas fa-wallet"></i>
+                <span>Wallet</span>
+            </button>
+            <button class="nav-item" data-screen="earn">
+                <i class="fas fa-coins"></i>
+                <span>Earn</span>
+            </button>
+            <button class="nav-item" data-screen="referral">
+                <i class="fas fa-users"></i>
+                <span>Referral</span>
+            </button>
+            <button class="nav-item" data-screen="profile">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Create Post Modal -->
+    <div id="createPostModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Post</h3>
+                <button class="close-btn" onclick="closeCreatePost()">&times;</button>
             </div>
-            
-            <div class="checkin-reward">
-                <div class="reward-amount" id="rewardAmount">0</div>
-                <div class="reward-label">BTX Reward</div>
+            <div class="modal-body">
+                <textarea id="postContent" placeholder="What's on your mind?" maxlength="500"></textarea>
+                <div class="post-options">
+                    <button class="option-btn" onclick="attachImage()">
+                        <i class="fas fa-image"></i>
+                        Add Image
+                    </button>
+                    <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                    <div class="image-preview" id="imagePreview"></div>
+                </div>
+                <button class="post-btn" onclick="submitPost()">Post</button>
             </div>
-            
-            <button class="checkin-btn" id="checkinBtn">Check In Now</button>
         </div>
     </div>
 
-    <!-- Referral Modal -->
-    <div class="modal" id="referralModal">
-        <div class="modal-content">
-            <button class="modal-close" id="closeReferralModalBtn">
-                <i class="fas fa-times"></i>
-            </button>
-            
-            <h2 class="checkin-title">Referral System</h2>
-            
-            <div class="referral-card">
-                <div class="referral-link-container">
-                    <div class="referral-link" id="referralLink">t.me/WinArenaGame_bot/open?id=123456789</div>
-                    <button class="copy-btn" id="copyReferralBtn">Copy</button>
-                </div>
-                
-                <div class="referral-stats">
-                    <div class="stat-box">
-                        <div class="stat-value" id="totalReferralsCount">0</div>
-                        <div class="stat-label">Total Referrals</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="referralEarnings">0</div>
-                        <div class="stat-label">Commission Earned</div>
-                    </div>
-                </div>
-                
-                <h3 style="margin-bottom: 10px; font-size: 16px;">Your Referrals</h3>
-                <div class="referrals-list" id="referralsList">
-                    <!-- Referrals will be loaded here -->
-                </div>
-            </div>
-        </div>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading...</p>
     </div>
 
-    <!-- Toast Notification -->
-    <div class="toast" id="toast"></div>
+    <!-- Notification Toast -->
+    <div id="notification" class="notification">
+        <span id="notificationMessage"></span>
+    </div>
 
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
-
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
     <!-- TON Connect SDK -->
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-
-    <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCeUiyfbsQR_HQ3li8g_Tk12JaXDsLDJEw",
-            authDomain: "midnight-flicks.firebaseapp.com",
-            databaseURL: "https://midnight-flicks-default-rtdb.firebaseio.com",
-            projectId: "midnight-flicks",
-            storageBucket: "midnight-flicks.firebasestorage.app",
-            messagingSenderId: "746505033779",
-            appId: "1:746505033779:web:1ac4f722a5a29a00856b46",
-            measurementId: "G-52MG9NG0ZV"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        const storage = firebase.storage();
-
-        // Telegram WebApp Initialization
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-
-        // TON Connect Initialization
-        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://your-domain.com/tonconnect-manifest.json',
-            buttonRootId: null
-        });
-
-        // Global Variables
-        let currentUser = null;
-        let userBalance = 0;
-        let isWalletConnected = false;
-        let currentCategory = 'all';
-        let checkinStreak = 0;
-        let lastCheckinDate = null;
-        let soundEnabled = true;
-        let notificationsEnabled = true;
-        let darkModeEnabled = false;
-
-        // Initialize App
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeApp();
-            setupEventListeners();
-            loadUserData();
-            loadGames();
-            loadTasks();
-            loadSocialFeed();
-            checkDailyCheckin();
-        });
-
-        // Initialize App
-        function initializeApp() {
-            // Get Telegram user data
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                currentUser = tg.initDataUnsafe.user;
-                document.getElementById('profileName').textContent = currentUser.first_name || 'User';
-                document.getElementById('profileAvatar').textContent = (currentUser.first_name || 'U').charAt(0).toUpperCase();
-                document.getElementById('profileId').textContent = currentUser.id;
-                
-                // Initialize user in Firebase if not exists
-                initializeUserInFirebase();
-            }
-        }
-
-        // Setup Event Listeners
-        function setupEventListeners() {
-            // Navigation
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    const section = this.getAttribute('data-section');
-                    switchSection(section);
-                });
-            });
-
-            // Game Categories
-            document.querySelectorAll('.category-chip').forEach(chip => {
-                chip.addEventListener('click', function() {
-                    document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
-                    this.classList.add('active');
-                    currentCategory = this.getAttribute('data-category');
-                    loadGames();
-                });
-            });
-
-            // Game Search
-            document.getElementById('gameSearch').addEventListener('input', function() {
-                loadGames(this.value);
-            });
-
-            // Wallet Tabs
-            document.querySelectorAll('.wallet-tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    document.querySelectorAll('.wallet-tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.wallet-tab-content').forEach(c => c.classList.remove('active'));
-                    
-                    this.classList.add('active');
-                    const tabName = this.getAttribute('data-tab');
-                    document.getElementById(tabName + 'Tab').classList.add('active');
-                    
-                    if (tabName === 'history') {
-                        loadTransactionHistory();
-                    }
-                });
-            });
-
-            // TON Wallet Connection
-            document.getElementById('connectWalletBtn').addEventListener('click', toggleWalletConnection);
-
-            // Deposit Amount
-            document.getElementById('depositAmount').addEventListener('input', function() {
-                const amount = parseFloat(this.value) || 0;
-                const btxAmount = amount * 500;
-                document.getElementById('btxReceive').textContent = btxAmount.toFixed(2) + ' BTX';
-            });
-
-            // Deposit Button
-            document.getElementById('depositBtn').addEventListener('click', handleDeposit);
-
-            // Withdraw Button
-            document.getElementById('withdrawBtn').addEventListener('click', handleWithdraw);
-
-            // Create Post
-            document.getElementById('createPostBtn').addEventListener('click', createPost);
-
-            // Upload Image
-            document.getElementById('uploadImageBtn').addEventListener('click', uploadImage);
-
-            // Watch Ads
-            document.getElementById('watchAdsCard').addEventListener('click', watchAd);
-
-            // Referral
-            document.getElementById('referralCard').addEventListener('click', function() {
-                document.getElementById('referralModal').classList.add('active');
-            });
-
-            // Daily Check-in
-            document.getElementById('dailyCheckinCard').addEventListener('click', function() {
-                document.getElementById('checkinModal').classList.add('active');
-                updateCheckinModal();
-            });
-
-            // Lucky Spin
-            document.getElementById('luckySpinCard').addEventListener('click', luckySpin);
-
-            // Check-in Button
-            document.getElementById('checkinBtn').addEventListener('click', performCheckin);
-
-            // Close Modals
-            document.getElementById('closeModalBtn').addEventListener('click', function() {
-                document.getElementById('checkinModal').classList.remove('active');
-            });
-
-            document.getElementById('closeReferralModalBtn').addEventListener('click', function() {
-                document.getElementById('referralModal').classList.remove('active');
-            });
-
-            // Copy ID
-            document.getElementById('copyIdBtn').addEventListener('click', function() {
-                const userId = document.getElementById('profileId').textContent;
-                copyToClipboard(userId);
-                showToast('User ID copied to clipboard!');
-            });
-
-            // Copy Referral Link
-            document.getElementById('copyReferralBtn').addEventListener('click', function() {
-                const referralLink = document.getElementById('referralLink').textContent;
-                copyToClipboard(referralLink);
-                showToast('Referral link copied to clipboard!');
-            });
-
-            // Settings Toggles
-            document.getElementById('soundToggle').addEventListener('click', function() {
-                this.classList.toggle('active');
-                soundEnabled = this.classList.contains('active');
-                saveUserSettings();
-                showToast(soundEnabled ? 'Sound enabled' : 'Sound disabled');
-            });
-
-            document.getElementById('notificationToggle').addEventListener('click', function() {
-                this.classList.toggle('active');
-                notificationsEnabled = this.classList.contains('active');
-                saveUserSettings();
-                showToast(notificationsEnabled ? 'Notifications enabled' : 'Notifications disabled');
-            });
-
-            document.getElementById('darkModeToggle').addEventListener('click', function() {
-                this.classList.toggle('active');
-                darkModeEnabled = this.classList.contains('active');
-                applyDarkMode(darkModeEnabled);
-                saveUserSettings();
-                showToast(darkModeEnabled ? 'Dark mode enabled' : 'Dark mode disabled');
-            });
-
-            // Language Change
-            document.getElementById('languageSelect').addEventListener('change', function() {
-                saveUserSettings();
-                showToast(`Language changed to ${this.options[this.selectedIndex].text}`);
-            });
-        }
-
-        // Switch Section
-        function switchSection(sectionName) {
-            // Update Navigation
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-                if (item.getAttribute('data-section') === sectionName) {
-                    item.classList.add('active');
-                }
-            });
-
-            // Update Content
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.getElementById(sectionName).classList.add('active');
-        }
-
-        // Initialize User in Firebase
-        function initializeUserInFirebase() {
-            if (!currentUser) return;
-
-            const userId = currentUser.id;
-            const userRef = database.ref('users/' + userId);
-
-            userRef.once('value').then((snapshot) => {
-                if (!snapshot.exists()) {
-                    // Create new user
-                    userRef.set({
-                        id: userId,
-                        name: currentUser.first_name || 'User',
-                        username: currentUser.username || '',
-                        balance: 0,
-                        checkinStreak: 0,
-                        lastCheckin: null,
-                        totalWinnings: 0,
-                        totalReferrals: 0,
-                        referralEarnings: 0,
-                        level: 1,
-                        xp: 0,
-                        vipLevel: 'Bronze',
-                        tonWallet: null,
-                        settings: {
-                            sound: true,
-                            notifications: true,
-                            darkMode: false,
-                            language: 'en'
-                        },
-                        createdAt: firebase.database.ServerValue.TIMESTAMP
-                    });
-                }
-            });
-        }
-
-        // Load User Data
-        function loadUserData() {
-            if (!currentUser) return;
-
-            const userId = currentUser.id;
-            const userRef = database.ref('users/' + userId);
-
-            userRef.on('value', (snapshot) => {
-                const userData = snapshot.val();
-                if (userData) {
-                    userBalance = userData.balance || 0;
-                    checkinStreak = userData.checkinStreak || 0;
-                    lastCheckinDate = userData.lastCheckin;
-                    
-                    // Update UI
-                    document.getElementById('userBalance').textContent = userBalance.toFixed(2) + ' BTX';
-                    document.getElementById('totalWinnings').textContent = userData.totalWinnings || 0;
-                    document.getElementById('totalReferrals').textContent = userData.totalReferrals || 0;
-                    document.getElementById('userLevel').textContent = userData.level || 1;
-                    
-                    // Update settings
-                    if (userData.settings) {
-                        soundEnabled = userData.settings.sound !== false;
-                        notificationsEnabled = userData.settings.notifications !== false;
-                        darkModeEnabled = userData.settings.darkMode === true;
-                        
-                        document.getElementById('soundToggle').classList.toggle('active', soundEnabled);
-                        document.getElementById('notificationToggle').classList.toggle('active', notificationsEnabled);
-                        document.getElementById('darkModeToggle').classList.toggle('active', darkModeEnabled);
-                        document.getElementById('languageSelect').value = userData.settings.language || 'en';
-                        
-                        applyDarkMode(darkModeEnabled);
-                    }
-                    
-                    // Update TON wallet button
-                    if (userData.tonWallet) {
-                        isWalletConnected = true;
-                        document.getElementById('walletBtnText').textContent = 'Disconnect';
-                    }
-                }
-            });
-        }
-
-        // Load Games
-        function loadGames(searchTerm = '') {
-            const gamesRef = database.ref('games');
-            const gamesGrid = document.getElementById('gamesGrid');
-            gamesGrid.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="spinner"></div></div>';
-
-            gamesRef.once('value').then((snapshot) => {
-                const games = [];
-                snapshot.forEach((childSnapshot) => {
-                    const game = childSnapshot.val();
-                    game.id = childSnapshot.key;
-                    
-                    // Filter by category
-                    if (currentCategory !== 'all' && game.category !== currentCategory) {
-                        return;
-                    }
-                    
-                    // Filter by search term
-                    if (searchTerm && !game.name.toLowerCase().includes(searchTerm.toLowerCase())) {
-                        return;
-                    }
-                    
-                    // Only show active games
-                    if (game.status !== 'active') {
-                        return;
-                    }
-                    
-                    games.push(game);
-                });
-
-                // Sort games (new games first)
-                games.sort((a, b) => {
-                    if (a.isNew && !b.isNew) return -1;
-                    if (!a.isNew && b.isNew) return 1;
-                    return 0;
-                });
-
-                // Render games
-                gamesGrid.innerHTML = '';
-                if (games.length === 0) {
-                    gamesGrid.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--gray);">No games found</div>';
-                    return;
-                }
-
-                games.forEach(game => {
-                    const gameCard = document.createElement('div');
-                    gameCard.className = 'game-card';
-                    gameCard.innerHTML = `
-                        <div class="game-thumbnail">
-                            <i class="fas fa-dice"></i>
-                        </div>
-                        <div class="game-info">
-                            <div class="game-name">${game.name}</div>
-                            <div class="game-stats">
-                                <span>RTP: ${game.rtp || '96'}%</span>
-                                <span>Min: ${game.minBet || '1'} BTX</span>
-                            </div>
-                        </div>
-                    `;
-                    
-                    gameCard.addEventListener('click', () => openGame(game));
-                    gamesGrid.appendChild(gameCard);
-                });
-            });
-        }
-
-        // Open Game
-        function openGame(game) {
-            if (!isWalletConnected) {
-                showToast('Please connect your TON wallet first');
-                return;
-            }
-
-            if (userBalance < game.minBet) {
-                showToast('Insufficient balance');
-                return;
-            }
-
-            // In a real implementation, this would load the game from Firebase Storage
-            // For now, we'll just show a message
-            showToast(`Opening ${game.name}...`);
-            
-            // Add XP for playing
-            addXP(5);
-        }
-
-        // Load Tasks
-        function loadTasks() {
-            const tasksRef = database.ref('tasks');
-            const tasksList = document.getElementById('tasksList');
-            tasksList.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="spinner"></div></div>';
-
-            tasksRef.once('value').then((snapshot) => {
-                const tasks = [];
-                snapshot.forEach((childSnapshot) => {
-                    const task = childSnapshot.val();
-                    task.id = childSnapshot.key;
-                    
-                    // Only show active tasks
-                    if (task.status !== 'active') {
-                        return;
-                    }
-                    
-                    tasks.push(task);
-                });
-
-                // Sort tasks by order
-                tasks.sort((a, b) => (a.order || 0) - (b.order || 0));
-
-                // Render tasks
-                tasksList.innerHTML = '';
-                if (tasks.length === 0) {
-                    tasksList.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--gray);">No tasks available</div>';
-                    return;
-                }
-
-                tasks.forEach(task => {
-                    const taskItem = document.createElement('div');
-                    taskItem.className = 'task-item';
-                    taskItem.innerHTML = `
-                        <div class="task-icon">
-                            <i class="fas fa-tasks"></i>
-                        </div>
-                        <div class="task-info">
-                            <div class="task-title">${task.title}</div>
-                            <div class="task-desc">${task.description}</div>
-                            <div class="task-reward">Reward: ${task.reward} BTX</div>
-                        </div>
-                        <button class="task-btn" data-task-id="${task.id}" data-task-link="${task.link}" data-task-reward="${task.reward}">Start</button>
-                    `;
-                    
-                    // Check if task is completed
-                    if (currentUser) {
-                        const userId = currentUser.id;
-                        database.ref('users/' + userId + '/completedTasks/' + task.id).once('value').then((taskSnapshot) => {
-                            if (taskSnapshot.exists()) {
-                                taskItem.querySelector('.task-btn').textContent = 'Completed';
-                                taskItem.querySelector('.task-btn').classList.add('completed');
-                                taskItem.querySelector('.task-btn').disabled = true;
-                            }
-                        });
-                    }
-                    
-                    tasksList.appendChild(taskItem);
-                });
-
-                // Add event listeners to task buttons
-                document.querySelectorAll('.task-btn:not(.completed)').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const taskId = this.getAttribute('data-task-id');
-                        const taskLink = this.getAttribute('data-task-link');
-                        const taskReward = parseFloat(this.getAttribute('data-task-reward'));
-                        
-                        startTask(taskId, taskLink, taskReward, this);
-                    });
-                });
-            });
-        }
-
-        // Start Task
-        function startTask(taskId, taskLink, taskReward, buttonElement) {
-            // Open task link
-            window.open(taskLink, '_blank');
-            
-            // Disable button temporarily
-            buttonElement.textContent = 'Loading...';
-            buttonElement.disabled = true;
-            
-            // After 10 seconds, complete the task
-            setTimeout(() => {
-                if (!currentUser) return;
-                
-                const userId = currentUser.id;
-                
-                // Mark task as completed
-                database.ref('users/' + userId + '/completedTasks/' + taskId).set(true);
-                
-                // Add reward to balance
-                updateUserBalance(taskReward);
-                
-                // Update button
-                buttonElement.textContent = 'Completed';
-                buttonElement.classList.add('completed');
-                
-                // Show notification
-                showToast(`Task completed! +${taskReward} BTX`);
-                
-                // Add XP
-                addXP(10);
-                
-                // Notify admin
-                notifyAdmin(`Task completed`, `User ${currentUser.first_name} completed task ${taskId} and earned ${taskReward} BTX`);
-            }, 10000);
-        }
-
-        // Load Social Feed
-        function loadSocialFeed() {
-            const feedRef = database.ref('socialFeed');
-            const socialFeed = document.getElementById('socialFeed');
-            socialFeed.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="spinner"></div></div>';
-
-            feedRef.orderByChild('timestamp').limitToLast(20).once('value').then((snapshot) => {
-                const posts = [];
-                snapshot.forEach((childSnapshot) => {
-                    const post = childSnapshot.val();
-                    post.id = childSnapshot.key;
-                    posts.push(post);
-                });
-
-                // Sort by timestamp (newest first)
-                posts.sort((a, b) => b.timestamp - a.timestamp);
-
-                // Render posts
-                socialFeed.innerHTML = '';
-                if (posts.length === 0) {
-                    socialFeed.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--gray);">No posts yet. Be the first to post!</div>';
-                    return;
-                }
-
-                posts.forEach(post => {
-                    const postElement = createPostElement(post);
-                    socialFeed.appendChild(postElement);
-                });
-            });
-        }
-
-        // Create Post Element
-        function createPostElement(post) {
-            const postDiv = document.createElement('div');
-            postDiv.className = 'post';
-            
-            const timestamp = new Date(post.timestamp).toLocaleString();
-            const isLiked = currentUser && post.likes && post.likes[currentUser.id];
-            
-            postDiv.innerHTML = `
-                <div class="post-header">
-                    <div class="user-avatar">${post.userName.charAt(0).toUpperCase()}</div>
-                    <div class="user-info">
-                        <div class="user-name">${post.userName}</div>
-                        <div class="post-time">${timestamp}</div>
-                    </div>
-                </div>
-                <div class="post-content">${post.content}</div>
-                ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="Post image">` : ''}
-                <div class="post-footer">
-                    <div class="post-action ${isLiked ? 'liked' : ''}" data-post-id="${post.id}" data-action="like">
-                        <i class="fas fa-heart"></i>
-                        <span>${post.likes ? Object.keys(post.likes).length : 0}</span>
-                    </div>
-                    <div class="post-action" data-post-id="${post.id}" data-action="comment">
-                        <i class="fas fa-comment"></i>
-                        <span>${post.comments ? Object.keys(post.comments).length : 0}</span>
-                    </div>
-                </div>
-            `;
-            
-            // Add event listeners
-            postDiv.querySelectorAll('.post-action').forEach(action => {
-                action.addEventListener('click', function() {
-                    const postId = this.getAttribute('data-post-id');
-                    const actionType = this.getAttribute('data-action');
-                    
-                    if (actionType === 'like') {
-                        toggleLike(postId, this);
-                    } else if (actionType === 'comment') {
-                        // In a real implementation, this would open a comment dialog
-                        showToast('Comment feature coming soon!');
-                    }
-                });
-            });
-            
-            return postDiv;
-        }
-
-        // Create Post
-        function createPost() {
-            if (!currentUser) {
-                showToast('Please log in to post');
-                return;
-            }
-
-            const content = document.getElementById('postInput').value.trim();
-            if (!content) {
-                showToast('Please enter some content');
-                return;
-            }
-
-            // Create post object
-            const post = {
-                userId: currentUser.id,
-                userName: currentUser.first_name || 'User',
-                content: content,
-                timestamp: Date.now(),
-                likes: {},
-                comments: {}
-            };
-
-            // Add to database
-            const newPostRef = database.ref('socialFeed').push();
-            newPostRef.set(post).then(() => {
-                // Clear input
-                document.getElementById('postInput').value = '';
-                
-                // Reload feed
-                loadSocialFeed();
-                
-                // Show notification
-                showToast('Post published successfully!');
-                
-                // Add XP
-                addXP(3);
-            });
-        }
-
-        // Upload Image
-        function uploadImage() {
-            if (!currentUser) {
-                showToast('Please log in to upload images');
-                return;
-            }
-
-            // In a real implementation, this would open a file picker and upload to Firebase Storage
-            showToast('Image upload feature coming soon!');
-        }
-
-        // Toggle Like
-        function toggleLike(postId, element) {
-            if (!currentUser) {
-                showToast('Please log in to like posts');
-                return;
-            }
-
-            const userId = currentUser.id;
-            const postRef = database.ref('socialFeed/' + postId + '/likes/' + userId);
-
-            postRef.once('value').then((snapshot) => {
-                if (snapshot.exists()) {
-                    // Unlike
-                    postRef.remove().then(() => {
-                        element.classList.remove('liked');
-                        const currentCount = parseInt(element.querySelector('span').textContent);
-                        element.querySelector('span').textContent = currentCount - 1;
-                    });
-                } else {
-                    // Like
-                    postRef.set(true).then(() => {
-                        element.classList.add('liked');
-                        const currentCount = parseInt(element.querySelector('span').textContent);
-                        element.querySelector('span').textContent = currentCount + 1;
-                    });
-                }
-            });
-        }
-
-        // Toggle Wallet Connection
-        async function toggleWalletConnection() {
-            if (isWalletConnected) {
-                // Disconnect wallet
-                await tonConnectUI.disconnect();
-                isWalletConnected = false;
-                document.getElementById('walletBtnText').textContent = 'Connect TON';
-                
-                // Update database
-                if (currentUser) {
-                    database.ref('users/' + currentUser.id + '/tonWallet').remove();
-                }
-                
-                showToast('Wallet disconnected');
-            } else {
-                // Connect wallet
-                try {
-                    await tonConnectUI.connectWallet();
-                    const wallet = tonConnectUI.wallet;
-                    
-                    if (wallet) {
-                        isWalletConnected = true;
-                        document.getElementById('walletBtnText').textContent = 'Disconnect';
-                        
-                        // Update database
-                        if (currentUser) {
-                            database.ref('users/' + currentUser.id + '/tonWallet').set({
-                                address: wallet.account.address,
-                                name: wallet.name || 'Unknown'
-                            });
-                        }
-                        
-                        showToast('Wallet connected successfully');
-                    }
-                } catch (error) {
-                    console.error('Failed to connect wallet:', error);
-                    showToast('Failed to connect wallet');
-                }
-            }
-        }
-
-        // Handle Deposit
-        async function handleDeposit() {
-            if (!isWalletConnected) {
-                showToast('Please connect your TON wallet first');
-                return;
-            }
-
-            const amount = parseFloat(document.getElementById('depositAmount').value);
-            if (!amount || amount < 1) {
-                showToast('Minimum deposit is 1 TON');
-                return;
-            }
-
-            // In a real implementation, this would initiate a TON transaction
-            // For now, we'll simulate it
-            showToast('Processing deposit...');
-            
-            // Simulate transaction delay
-            setTimeout(() => {
-                const btxAmount = amount * 500;
-                updateUserBalance(btxAmount);
-                
-                // Add transaction to history
-                addTransaction('deposit', amount, btxAmount, 'completed');
-                
-                // Clear form
-                document.getElementById('depositAmount').value = '';
-                document.getElementById('btxReceive').textContent = '0 BTX';
-                
-                showToast(`Deposit successful! +${btxAmount} BTX`);
-                
-                // Notify admin
-                notifyAdmin('New Deposit', `User ${currentUser.first_name} deposited ${amount} TON (${btxAmount} BTX)`);
-            }, 2000);
-        }
-
-        // Handle Withdraw
-        function handleWithdraw() {
-            if (!isWalletConnected) {
-                showToast('Please connect your TON wallet first');
-                return;
-            }
-
-            const amount = parseFloat(document.getElementById('withdrawAmount').value);
-            const address = document.getElementById('withdrawAddress').value.trim();
-            
-            if (!amount || amount < 250) {
-                showToast('Minimum withdrawal is 250 BTX');
-                return;
-            }
-            
-            if (amount > userBalance) {
-                showToast('Insufficient balance');
-                return;
-            }
-            
-            if (!address) {
-                showToast('Please enter your TON wallet address');
-                return;
-            }
-            
-            // Check if user has deposited at least once
-            if (currentUser) {
-                database.ref('users/' + currentUser.id + '/hasDeposited').once('value').then((snapshot) => {
-                    if (!snapshot.exists()) {
-                        showToast('You must deposit at least once before withdrawing');
-                        return;
-                    }
-                    
-                    // Process withdrawal
-                    processWithdrawal(amount, address);
-                });
-            }
-        }
-
-        // Process Withdrawal
-        function processWithdrawal(amount, address) {
-            // Deduct from balance
-            updateUserBalance(-amount);
-            
-            // Add transaction to history
-            addTransaction('withdraw', amount, amount / 500, 'pending');
-            
-            // Add to admin panel for approval
-            if (currentUser) {
-                database.ref('withdrawals').push({
-                    userId: currentUser.id,
-                    userName: currentUser.first_name || 'User',
-                    amount: amount,
-                    tonAmount: amount / 500,
-                    address: address,
-                    timestamp: Date.now(),
-                    status: 'pending'
-                });
-            }
-            
-            // Clear form
-            document.getElementById('withdrawAmount').value = '';
-            document.getElementById('withdrawAddress').value = '';
-            
-            showToast('Withdrawal request submitted. Pending admin approval.');
-            
-            // Notify admin
-            notifyAdmin('New Withdrawal Request', `User ${currentUser.first_name} requested withdrawal of ${amount} BTX (${amount/500} TON) to ${address}`);
-        }
-
-        // Load Transaction History
-        function loadTransactionHistory() {
-            if (!currentUser) return;
-            
-            const userId = currentUser.id;
-            const transactionsRef = database.ref('users/' + userId + '/transactions');
-            const transactionHistory = document.getElementById('transactionHistory');
-            transactionHistory.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="spinner"></div></div>';
-
-            transactionsRef.orderByChild('timestamp').limitToLast(20).once('value').then((snapshot) => {
-                const transactions = [];
-                snapshot.forEach((childSnapshot) => {
-                    const transaction = childSnapshot.val();
-                    transaction.id = childSnapshot.key;
-                    transactions.push(transaction);
-                });
-
-                // Sort by timestamp (newest first)
-                transactions.sort((a, b) => b.timestamp - a.timestamp);
-
-                // Render transactions
-                transactionHistory.innerHTML = '';
-                if (transactions.length === 0) {
-                    transactionHistory.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--gray);">No transactions yet</div>';
-                    return;
-                }
-
-                transactions.forEach(transaction => {
-                    const transactionElement = document.createElement('div');
-                    transactionElement.className = 'transaction-item';
-                    
-                    const isPositive = transaction.type === 'deposit';
-                    const amountClass = isPositive ? 'positive' : 'negative';
-                    const sign = isPositive ? '+' : '-';
-                    
-                    const timestamp = new Date(transaction.timestamp).toLocaleString();
-                    
-                    transactionElement.innerHTML = `
-                        <div>
-                            <div class="transaction-type">${transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}</div>
-                            <div style="font-size: 12px; color: var(--gray);">${timestamp}</div>
-                            ${transaction.status ? `<div style="font-size: 12px; color: ${transaction.status === 'completed' ? 'var(--success)' : 'var(--warning)'};">${transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}</div>` : ''}
-                        </div>
-                        <div class="transaction-amount ${amountClass}">${sign}${transaction.amount} BTX</div>
-                    `;
-                    
-                    transactionHistory.appendChild(transactionElement);
-                });
-            });
-        }
-
-        // Add Transaction
-        function addTransaction(type, amount, tonAmount, status) {
-            if (!currentUser) return;
-            
-            const userId = currentUser.id;
-            const transaction = {
-                type: type,
-                amount: amount,
-                tonAmount: tonAmount,
-                status: status,
-                timestamp: Date.now()
-            };
-            
-            database.ref('users/' + userId + '/transactions').push(transaction);
-        }
-
-        // Watch Ad
-        function watchAd() {
-            if (!currentUser) {
-                showToast('Please log in to watch ads');
-                return;
-            }
-
-            // In a real implementation, this would load the Monetag ad script
-            // For now, we'll simulate it
-            showToast('Loading ad...');
-            
-            // Simulate ad loading
-            setTimeout(() => {
-                // Add 0.10 BTX to balance
-                updateUserBalance(0.10);
-                
-                // Update stats
-                if (currentUser) {
-                    const userId = currentUser.id;
-                    const today = new Date().toDateString();
-                    
-                    // Update today's ads watched
-                    database.ref('users/' + userId + '/adsWatched/' + today).transaction((currentValue) => {
-                        return (currentValue || 0) + 1;
-                    });
-                    
-                    // Update total ads watched
-                    database.ref('users/' + userId + '/totalAdsWatched').transaction((currentValue) => {
-                        return (currentValue || 0) + 1;
-                    });
-                }
-                
-                showToast('Ad watched! +0.10 BTX');
-                
-                // Add XP
-                addXP(1);
-            }, 2000);
-        }
-
-        // Lucky Spin
-        function luckySpin() {
-            if (!currentUser) {
-                showToast('Please log in to spin');
-                return;
-            }
-
-            // Check if user has already spun today
-            const userId = currentUser.id;
-            const today = new Date().toDateString();
-            
-            database.ref('users/' + userId + '/lastLuckySpin').once('value').then((snapshot) => {
-                if (snapshot.exists() && snapshot.val() === today) {
-                    showToast('You already used your free spin today. Come back tomorrow!');
-                    return;
-                }
-                
-                // Simulate spin
-                showToast('Spinning...');
-                
-                setTimeout(() => {
-                    // Random reward between 0.5 and 5 BTX
-                    const reward = (Math.random() * 4.5 + 0.5).toFixed(2);
-                    
-                    // Add reward to balance
-                    updateUserBalance(parseFloat(reward));
-                    
-                    // Update last spin date
-                    database.ref('users/' + userId + '/lastLuckySpin').set(today);
-                    
-                    showToast(`You won ${reward} BTX!`);
-                    
-                    // Add XP
-                    addXP(2);
-                }, 2000);
-            });
-        }
-
-        // Check Daily Check-in
-        function checkDailyCheckin() {
-            if (!currentUser) return;
-            
-            const userId = currentUser.id;
-            const today = new Date().toDateString();
-            
-            database.ref('users/' + userId + '/lastCheckin').once('value').then((snapshot) => {
-                if (snapshot.exists()) {
-                    lastCheckinDate = snapshot.val();
-                    
-                    // Check if last check-in was yesterday
-                    const yesterday = new Date();
-                    yesterday.setDate(yesterday.getDate() - 1);
-                    
-                    if (lastCheckinDate === yesterday.toDateString()) {
-                        // Continue streak
-                        checkinStreak = (checkinStreak % 7) + 1;
-                    } else if (lastCheckinDate !== today) {
-                        // Reset streak
-                        checkinStreak = 1;
-                    }
-                } else {
-                    // First time check-in
-                    checkinStreak = 1;
-                }
-                
-                // Show check-in modal if not checked in today
-                if (lastCheckinDate !== today) {
-                    setTimeout(() => {
-                        document.getElementById('checkinModal').classList.add('active');
-                        updateCheckinModal();
-                    }, 1000);
-                }
-            });
-        }
-
-        // Update Check-in Modal
-        function updateCheckinModal() {
-            const checkinDays = document.querySelectorAll('.checkin-day');
-            const rewardAmount = document.getElementById('rewardAmount');
-            
-            // Update days
-            checkinDays.forEach((day, index) => {
-                day.classList.remove('completed', 'today');
-                
-                if (index < checkinStreak - 1) {
-                    day.classList.add('completed');
-                } else if (index === checkinStreak - 1) {
-                    day.classList.add('today');
-                }
-            });
-            
-            // Update reward amount
-            rewardAmount.textContent = checkinStreak;
-        }
-
-        // Perform Check-in
-        function performCheckin() {
-            if (!currentUser) return;
-            
-            const userId = currentUser.id;
-            const today = new Date().toDateString();
-            
-            // Check if already checked in today
-            if (lastCheckinDate === today) {
-                showToast('You already checked in today!');
-                return;
-            }
-            
-            // Add reward to balance
-            updateUserBalance(checkinStreak);
-            
-            // Update check-in data
-            database.ref('users/' + userId).update({
-                lastCheckin: today,
-                checkinStreak: checkinStreak
-            });
-            
-            // Add transaction
-            addTransaction('checkin', checkinStreak, 0, 'completed');
-            
-            // Show notification
-            showToast(`Check-in successful! +${checkinStreak} BTX`);
-            
-            // Close modal
-            document.getElementById('checkinModal').classList.remove('active');
-            
-            // Add XP
-            addXP(5);
-            
-            // Notify admin
-            notifyAdmin('Daily Check-in', `User ${currentUser.first_name} checked in for day ${checkinStreak} and earned ${checkinStreak} BTX`);
-        }
-
-        // Update User Balance
-        function updateUserBalance(amount) {
-            if (!currentUser) return;
-            
-            const userId = currentUser.id;
-            userBalance += amount;
-            
-            // Update in database
-            database.ref('users/' + userId + '/balance').set(userBalance);
-            
-            // Update UI
-            document.getElementById('userBalance').textContent = userBalance.toFixed(2) + ' BTX';
-            
-            // If this is a deposit, mark hasDeposited as true
-            if (amount > 0) {
-                database.ref('users/' + userId + '/hasDeposited').set(true);
-            }
-        }
-
-        // Add XP
-        function addXP(amount) {
-            if (!currentUser) return;
-            
-            const userId = currentUser.id;
-            
-            // Add XP in database
-            database.ref('users/' + userId + '/xp').transaction((currentXP) => {
-                const newXP = (currentXP || 0) + amount;
-                
-                // Check for level up
-                const currentLevel = Math.floor((currentXP || 0) / 100) + 1;
-                const newLevel = Math.floor(newXP / 100) + 1;
-                
-                if (newLevel > currentLevel) {
-                    showToast(`Level up! You are now level ${newLevel}`);
-                    database.ref('users/' + userId + '/level').set(newLevel);
-                }
-                
-                return newXP;
-            });
-        }
-
-        // Save User Settings
-        function saveUserSettings() {
-            if (!currentUser) return;
-            
-            const userId = currentUser.id;
-            
-            database.ref('users/' + userId + '/settings').set({
-                sound: soundEnabled,
-                notifications: notificationsEnabled,
-                darkMode: darkModeEnabled,
-                language: document.getElementById('languageSelect').value
-            });
-        }
-
-        // Apply Dark Mode
-        function applyDarkMode(enabled) {
-            if (enabled) {
-                document.documentElement.style.setProperty('--light', '#2D3436');
-                document.documentElement.style.setProperty('--white', '#1A1A1A');
-                document.documentElement.style.setProperty('--gray', '#B2BEC3');
-                document.documentElement.style.setProperty('--dark', '#F5F7FA');
-                document.body.style.backgroundColor = '#1A1A1A';
-            } else {
-                document.documentElement.style.setProperty('--light', '#F5F7FA');
-                document.documentElement.style.setProperty('--white', '#FFFFFF');
-                document.documentElement.style.setProperty('--gray', '#636E72');
-                document.documentElement.style.setProperty('--dark', '#2D3436');
-                document.body.style.backgroundColor = '#F5F7FA';
-            }
-        }
-
-        // Copy to Clipboard
-        function copyToClipboard(text) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-        }
-
-        // Show Toast Notification
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-
-        // Notify Admin
-        function notifyAdmin(title, message) {
-            // In a real implementation, this would send a notification to the admin
-            // For now, we'll just log it
-            console.log(`Admin Notification: ${title} - ${message}`);
-            
-            // You could also send this to a specific admin notifications node in Firebase
-            database.ref('adminNotifications').push({
-                title: title,
-                message: message,
-                timestamp: Date.now(),
-                read: false
-            });
-        }
-    </script>
+    
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Main Script -->
+    <script src="script.js"></script>
 </body>
 </html>
