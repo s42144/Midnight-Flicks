@@ -3,35 +3,73 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,maximum-scale=1" />
-  <title>Monetag Ads Integration</title>
+  <title>Telegram API Integration</title>
   
-  <!-- Monetag SDK -->
-  <script src="//libtl.com/sdk.js" data-zone="9970324" data-sdk="show_9970324"></script>
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   
   <style>
-    .ad-card {
+    body {
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1A1A2E 0%, #16213E 30%, #0F3460 70%, #533483 100%);
+      color: #ffffff;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .user-card {
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(20px);
       border-radius: 20px;
       padding: 24px;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
       border: 1px solid rgba(255, 255, 255, 0.2);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
       text-align: center;
     }
     
-    .ad-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 12px;
+    .user-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      border: 4px solid #4ECDC4;
+      object-fit: cover;
     }
     
-    .ad-reward {
-      font-size: 14px;
-      color: #4ECDC4;
-      font-weight: 600;
+    .user-name {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .user-id {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.7);
       margin-bottom: 16px;
+    }
+    
+    .user-details {
+      text-align: left;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+    
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    
+    .detail-label {
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .detail-value {
+      color: #4ECDC4;
     }
     
     .btn-primary {
@@ -48,73 +86,54 @@
       box-shadow: 0 4px 12px rgba(107, 115, 255, 0.3);
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      margin-top: 16px;
     }
     
     .btn-primary:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(107, 115, 255, 0.4);
     }
-    
-    .btn-primary:active {
-      transform: translateY(0);
-    }
-    
-    .btn-primary:disabled {
-      background: rgba(255, 255, 255, 0.1);
-      color: rgba(255, 255, 255, 0.4);
-      cursor: not-allowed;
-      box-shadow: none;
-    }
   </style>
 </head>
 <body>
-  <div class="ad-card">
-    <div class="ad-title">Watch Advertisement</div>
-    <div class="ad-reward">Earn 500 SHB per ad</div>
-    <button class="btn-primary" id="showAdBtn">
-      Watch Ad
-    </button>
+  <div class="user-card">
+    <img id="userAvatar" class="user-avatar" src="https://via.placeholder.com/120" alt="User Avatar" />
+    <div id="userName" class="user-name">Loading...</div>
+    <div id="userId" class="user-id">ID: ...</div>
+    
+    <div class="user-details">
+      <div class="detail-row">
+        <span class="detail-label">Username:</span>
+        <span id="userUsername" class="detail-value">...</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Language:</span>
+        <span id="userLanguage" class="detail-value">...</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Theme:</span>
+        <span id="userTheme" class="detail-value">...</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Platform:</span>
+        <span id="userPlatform" class="detail-value">...</span>
+      </div>
+    </div>
+    
+    <button id="expandBtn" class="btn-primary">Expand Web App</button>
   </div>
 
   <script>
-    // Ad Statistics Tracking
-    let adStats = { 
-      today: 0, 
-      yesterday: 0, 
-      thisWeek: 0, 
-      thisMonth: 0, 
-      lifetime: 0,
-      lastAdDate: null,
-      lastWeekReset: null,
-      lastMonthReset: null
-    };
+    // Initialize Telegram WebApp
+    const tg = window.Telegram.WebApp;
     
-    let coinsEarned = 0;
-    let adLoading = false;
+    // User data
+    let userId = null;
+    let userName = null;
+    let userAvatar = null;
+    let userUsername = null;
     
     // Utility Functions
-    function now() {
-      return Math.floor(Date.now() / 1000);
-    }
-    
-    function getToday() {
-      const date = new Date();
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    }
-    
-    function getWeekStart() {
-      const date = new Date();
-      const day = date.getDay();
-      const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-      date.setDate(diff);
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    }
-    
-    function getMonthStart() {
-      const date = new Date();
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`;
-    }
-    
     function notify(message, duration = 2500) {
       const notification = document.createElement('div');
       notification.className = 'notification';
@@ -141,78 +160,70 @@
       }, duration);
     }
     
-    function resetAdStatsIfNeeded() {
-      const today = getToday();
-      const weekStart = getWeekStart();
-      const monthStart = getMonthStart();
+    // Get Telegram User Data
+    function getTelegramUserData() {
+      tg.expand();
+      tg.ready();
       
-      if (adStats.lastAdDate !== today) {
-        adStats.yesterday = adStats.today;
-        adStats.today = 0;
-        adStats.lastAdDate = today;
+      const user = tg.initDataUnsafe?.user;
+      
+      if (user && user.id) {
+        userId = user.id.toString();
+        userName = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+        userUsername = user.username || 'Not set';
+        
+        if (user.photo_url) {
+          userAvatar = user.photo_url;
+        } else {
+          userAvatar = "https://via.placeholder.com/120";
+        }
+        
+        // Update UI
+        document.getElementById('userAvatar').src = userAvatar;
+        document.getElementById('userName').textContent = userName;
+        document.getElementById('userId').textContent = 'ID: ' + userId;
+        document.getElementById('userUsername').textContent = userUsername;
+        document.getElementById('userLanguage').textContent = tg.initDataUnsafe?.user?.language_code || 'Unknown';
+        document.getElementById('userTheme').textContent = tg.colorScheme || 'Unknown';
+        document.getElementById('userPlatform').textContent = tg.platform || 'Unknown';
+        
+        console.log('Telegram User ID:', userId);
+        console.log('Telegram User Name:', userName);
+        console.log('Telegram Username:', userUsername);
+        
+        return true;
       }
       
-      if (adStats.lastWeekReset !== weekStart) {
-        adStats.thisWeek = 0;
-        adStats.lastWeekReset = weekStart;
-      }
+      console.warn('Running outside Telegram environment - using test user');
+      userId = 'test_' + Math.floor(10000 + Math.random() * 89999).toString();
+      userName = 'Test User';
+      userUsername = 'testuser';
+      userAvatar = "https://via.placeholder.com/120";
       
-      if (adStats.lastMonthReset !== monthStart) {
-        adStats.thisMonth = 0;
-        adStats.lastMonthReset = monthStart;
-      }
+      // Update UI
+      document.getElementById('userAvatar').src = userAvatar;
+      document.getElementById('userName').textContent = userName;
+      document.getElementById('userId').textContent = 'ID: ' + userId;
+      document.getElementById('userUsername').textContent = userUsername;
+      document.getElementById('userLanguage').textContent = 'Unknown';
+      document.getElementById('userTheme').textContent = 'Unknown';
+      document.getElementById('userPlatform').textContent = 'Unknown';
+      
+      return true;
     }
     
-    // Award Referral Commission (for ad earnings)
-    function awardReferralCommission(earnedAmount) {
-      // This function would be implemented based on your referral system
-      // It's a placeholder to show where referral commission would be awarded
-      console.log(`Awarding referral commission for ${earnedAmount} SHB earned from ads`);
-    }
-    
-    // Initialize Ad Button
-    document.getElementById('showAdBtn').addEventListener('click', () => {
-      if (adLoading) return;
-      
-      adLoading = true;
-      document.getElementById('showAdBtn').textContent = 'Loading...';
-      
-      if (typeof show_9970324 === 'function') {
-        show_9970324().then(() => {
-          adLoading = false;
-          document.getElementById('showAdBtn').textContent = 'Watch Ad';
-          
-          const adReward = 500;
-          coinsEarned += adReward;
-          
-          // Award referral commission for ad watching
-          awardReferralCommission(adReward);
-          
-          adStats.today++;
-          adStats.thisWeek++;
-          adStats.thisMonth++;
-          adStats.lifetime++;
-          adStats.lastAdDate = getToday();
-          
-          notify('Earned 500 SHB for watching ad!');
-          
-          // Here you would typically update the UI and save to database
-          console.log('Ad stats updated:', adStats);
-          console.log('New balance:', coinsEarned);
-        }).catch(() => {
-          adLoading = false;
-          document.getElementById('showAdBtn').textContent = 'Watch Ad';
-          notify('Ad failed to load. Please try again.');
-        });
-      } else {
-        adLoading = false;
-        document.getElementById('showAdBtn').textContent = 'Watch Ad';
-        notify('Ad service not available.');
-      }
+    // Expand Web App
+    document.getElementById('expandBtn').addEventListener('click', () => {
+      tg.expand();
+      notify('Web App expanded!');
     });
     
-    // Initialize ad stats
-    resetAdStatsIfNeeded();
+    // Initialize
+    if (getTelegramUserData()) {
+      notify('Telegram API initialized successfully!');
+    } else {
+      notify('Failed to initialize Telegram API');
+    }
   </script>
 </body>
 </html>
