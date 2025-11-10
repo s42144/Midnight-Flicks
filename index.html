@@ -1,593 +1,441 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,maximum-scale=1" />
-  <title>Referral System</title>
-  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Midnight Flicks - Deposit 4 TON</title>
+
+  <!-- TonConnect manifest link (required by TON Connect) -->
+  <link rel="tonconnect" href="https://midnight-flicks-adults.vercel.app/tonconnect-manifest.json">
+
+  <!-- TonConnect SDK (UMD build) -->
+  <script src="https://cdn.jsdelivr.net/npm/@tonconnect/sdk/dist/tonconnect.umd.min.js"></script>
+
   <style>
-    body {
-      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1A1A2E 0%, #16213E 30%, #0F3460 70%, #533483 100%);
-      color: #ffffff;
-      padding: 20px;
-      min-height: 100vh;
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --muted:#9aa6bf;
+      --accent:#7c5cff;
+      --success:#28c76f;
+      --danger:#ff6b6b;
+      --glass: rgba(255,255,255,0.03);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
     }
-    
-    .referral-card {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(20px);
-      border-radius: 20px;
-      padding: 24px;
-      margin-bottom: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    html,body{
+      height:100%;
+      margin:0;
+      background: linear-gradient(180deg, #071029 0%, #0f1724 60%);
+      color:#e6eef8;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
     }
-    
-    .referral-title {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      text-align: center;
+    .wrap{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
+      box-sizing:border-box;
     }
-    
-    .referral-link-box {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 16px;
+    .card{
+      width:100%;
+      max-width:520px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:14px;
+      padding:28px;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+      border: 1px solid rgba(255,255,255,0.03);
     }
-    
-    .referral-link {
-      flex: 1;
-      font-size: 12px;
-      color: #4ECDC4;
-      font-weight: 600;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    h1{
+      margin:0 0 8px 0;
+      font-size:20px;
+      letter-spacing: -0.2px;
     }
-    
-    .copy-icon {
-      width: 24px;
-      height: 24px;
-      cursor: pointer;
-      opacity: 0.7;
-      transition: opacity 0.3s ease;
+    p.lead{
+      margin:0 0 22px 0;
+      color:var(--muted);
+      font-size:14px;
     }
-    
-    .copy-icon:hover {
-      opacity: 1;
+    .controls{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
     }
-    
-    .referral-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 12px;
-      margin-bottom: 16px;
+    button{
+      appearance:none;
+      border:0;
+      outline:0;
+      cursor:pointer;
+      padding:12px 16px;
+      border-radius:10px;
+      font-weight:600;
+      color:white;
+      background:linear-gradient(90deg,var(--accent), #5b8bff);
+      box-shadow: 0 6px 18px rgba(124,92,255,0.18), inset 0 -1px 0 rgba(255,255,255,0.03);
+      transition: transform .12s ease, box-shadow .12s;
     }
-    
-    .referral-stat {
-      text-align: center;
-      padding: 12px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+    button.secondary{
+      background: transparent;
+      color:var(--muted);
+      border:1px solid rgba(255,255,255,0.04);
+      box-shadow:none;
+      font-weight:600;
     }
-    
-    .referral-stat-label {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.7);
-      font-weight: 600;
-      text-transform: uppercase;
-      margin-bottom: 4px;
+    button:active{ transform: translateY(1px); }
+    .wallet-info{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex:1;
+      justify-content:space-between;
+      background:var(--glass);
+      padding:12px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.02);
     }
-    
-    .referral-stat-value {
-      font-size: 20px;
-      font-weight: 700;
-      color: #4ECDC4;
+    .addr{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+      color:#dbe9ff;
+      font-size:13px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      max-width:260px;
     }
-    
-    .btn-primary {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #6B73FF 0%, #4ECDC4 100%);
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(107, 115, 255, 0.3);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    .status{
+      font-size:13px;
+      color:var(--muted);
     }
-    
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(107, 115, 255, 0.4);
+    .notice{
+      margin-top:18px;
+      padding:12px 14px;
+      border-radius:10px;
+      background: rgba(255,255,255,0.02);
+      color:var(--muted);
+      font-size:13px;
     }
-    
-    .welcome-card {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(20px);
-      border-radius: 24px;
-      padding: 40px 30px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-      text-align: center;
-      max-width: 400px;
-      width: 100%;
-      margin: 0 auto;
+    .success{
+      color:var(--success);
+      font-weight:700;
     }
-    
-    .welcome-icon {
-      font-size: 64px;
-      margin-bottom: 20px;
+    .error{
+      color:var(--danger);
+      font-weight:700;
     }
-    
-    .welcome-title {
-      font-size: 28px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #6B73FF 0%, #4ECDC4 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 16px;
+    footer{
+      margin-top:18px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      color:var(--muted);
+      font-size:13px;
     }
-    
-    .welcome-message {
-      font-size: 16px;
-      color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 24px;
-      line-height: 1.6;
+    .brand{
+      display:flex;gap:10px;align-items:center;
     }
-    
-    .referrer-info {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+    .logo{
+      width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#7c5cff,#5b8bff);
+      display:flex;align-items:center;justify-content:center;font-weight:700;color:white;
+      box-shadow: 0 6px 20px rgba(92,72,255,0.18);
     }
-    
-    .referrer-label {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.7);
-      font-weight: 600;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-    
-    .referrer-details {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    
-    .referrer-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      border: 2px solid #4ECDC4;
-    }
-    
-    .referrer-name {
-      font-size: 18px;
-      font-weight: 700;
-      color: #ffffff;
-    }
-    
-    .referrer-id {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.7);
-    }
-    
-    .welcome-countdown {
-      font-size: 14px;
-      color: #4ECDC4;
-      font-weight: 600;
-    }
-    
-    .referral-list-item {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(20px);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    
-    .referral-list-avatar {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      border: 2px solid #4ECDC4;
-      object-fit: cover;
-      flex-shrink: 0;
-    }
-    
-    .referral-list-info {
-      flex: 1;
-      min-width: 0;
-    }
-    
-    .referral-list-name {
-      font-size: 16px;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 4px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    
-    .referral-list-id {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 4px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    
-    .referral-list-balance {
-      font-size: 14px;
-      font-weight: 600;
-      color: #4ECDC4;
-    }
-    
-    .referral-commission {
-      font-size: 12px;
-      font-weight: 600;
-      color: #FFD166;
-      margin-top: 4px;
-    }
-    
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.8);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      padding: 20px;
-    }
-    
-    .modal-content {
-      background: linear-gradient(135deg, #1A1A2E 0%, #16213E 30%, #0F3460 70%, #533483 100%);
-      border-radius: 24px;
-      padding: 24px;
-      max-width: 480px;
-      width: 100%;
-      max-height: 80vh;
-      overflow-y: auto;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-    }
-    
-    .modal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-    
-    .modal-title {
-      font-size: 24px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #6B73FF 0%, #4ECDC4 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .modal-close {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
-      color: #ffffff;
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-    }
-    
-    .modal-close:hover {
-      background: rgba(255, 255, 255, 0.2);
+    @media (max-width:520px){
+      .controls{ flex-direction:column; align-items:stretch; }
+      .wallet-info{ justify-content:flex-start; gap:10px; }
     }
   </style>
 </head>
 <body>
-  <div class="referral-card">
-    <div class="referral-title">Referral Program</div>
-    
-    <div class="referral-link-box">
-      <span class="referral-link" id="referralLink">https://t.me/YourBotName/myapp?startapp=USER_ID</span>
-      <img src="https://i.postimg.cc/W3CrXJsL/copy.gif?raw=true" 
-           class="copy-icon" 
-           id="copyReferralLink" 
-           alt="Copy" />
-    </div>
-    
-    <div class="referral-stats">
-      <div class="referral-stat">
-        <div class="referral-stat-label">Total Referrals</div>
-        <div class="referral-stat-value" id="referralCount">0</div>
+  <div class="wrap">
+    <div class="card" role="region" aria-label="TON payment">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+        <div>
+          <h1>Deposit 4 TON</h1>
+          <p class="lead">Connect a TON-compatible wallet and send a minimum deposit of 4 TON to access premium content.</p>
+        </div>
+        <div style="text-align:right;">
+          <div style="color:var(--muted);font-size:12px;">Receiver</div>
+          <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;color:#dbe9ff;">
+            UQACiEaN0Qt2TjpxBdJ7XZateCvEPjdA7qf5bMo5uCPLbSoh
+          </div>
+        </div>
       </div>
-      <div class="referral-stat">
-        <div class="referral-stat-label">Total Earnings</div>
-        <div class="referral-stat-value" id="referralEarnings">0</div>
+
+      <div style="height:14px"></div>
+
+      <div class="controls" role="form" aria-label="wallet controls">
+        <div class="wallet-info" id="walletInfo" aria-live="polite">
+          <div>
+            <div style="font-size:12px;color:var(--muted)">Connected Wallet</div>
+            <div class="addr" id="walletAddress">Not connected</div>
+          </div>
+          <div class="status" id="connStatus">Idle</div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button id="connectBtn">Connect TON Wallet</button>
+          <button class="secondary" id="payBtn" title="Send 4 TON">Pay 4 TON</button>
+        </div>
       </div>
-    </div>
-    
-    <button class="btn-primary" id="viewReferralsBtn">View My Referrals</button>
-  </div>
-  
-  <!-- Referral List Modal -->
-  <div class="modal-overlay" id="referralModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-title">My Referrals</div>
-        <button class="modal-close" id="closeReferralModal">×</button>
-      </div>
-      <div id="referralListContent"></div>
+
+      <div class="notice" id="notice">Minimum deposit: <strong>4 TON</strong>. No backend — this page initiates the TON Transfer request using TON Connect.</div>
+
+      <footer>
+        <div class="brand">
+          <div class="logo">MF</div>
+          <div style="line-height:1;">
+            <div style="font-weight:700">Midnight Flicks</div>
+            <div style="font-size:12px;color:var(--muted)">Private content access</div>
+          </div>
+        </div>
+        <div id="resultMessage" aria-live="polite"></div>
+      </footer>
     </div>
   </div>
 
   <script>
-    // User data
-    let userId = 'USER_ID'; // This would be replaced with actual user ID
-    let userName = 'User Name'; // This would be replaced with actual user name
-    let referralCount = 0;
-    let totalReferralCommission = 0;
-    
-    // Utility Functions
-    function now() {
-      return Math.floor(Date.now() / 1000);
+    // ----------------------------------------------------
+    // Configuration (user-provided)
+    // ----------------------------------------------------
+    const RECEIVER_ADDRESS = 'UQACiEaN0Qt2TjpxBdJ7XZateCvEPjdA7qf5bMo5uCPLbSoh';
+    const MIN_TON = 4; // TON
+    const MIN_NANO = String(Math.floor(MIN_TON * 1e9)); // TonConnect uses nanotons (1 TON = 1e9 nanotons)
+    const MANIFEST_URL = 'https://midnight-flicks-adults.vercel.app/tonconnect-manifest.json';
+    const LOCAL_STORAGE_KEY = 'ton_connected_address';
+
+    // ----------------------------------------------------
+    // Helpers & UI
+    // ----------------------------------------------------
+    const connectBtn = document.getElementById('connectBtn');
+    const payBtn = document.getElementById('payBtn');
+    const walletAddressEl = document.getElementById('walletAddress');
+    const connStatusEl = document.getElementById('connStatus');
+    const resultMessageEl = document.getElementById('resultMessage');
+
+    function setStatus(text, tone){
+      connStatusEl.textContent = text;
+      connStatusEl.style.color = tone === 'ok' ? 'var(--success)' : tone === 'err' ? 'var(--danger)' : 'var(--muted)';
     }
-    
-    function notify(message, duration = 2500) {
-      const notification = document.createElement('div');
-      notification.className = 'notification';
-      notification.textContent = message;
-      notification.style.position = 'fixed';
-      notification.style.top = '20px';
-      notification.style.left = '50%';
-      notification.style.transform = 'translateX(-50%)';
-      notification.style.background = 'linear-gradient(135deg, #6B73FF 0%, #4ECDC4 100%)';
-      notification.style.color = '#fff';
-      notification.style.padding = '16px 32px';
-      notification.style.borderRadius = '12px';
-      notification.style.fontSize = '14px';
-      notification.style.fontWeight = '600';
-      notification.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)';
-      notification.style.zIndex = '10000';
-      notification.style.maxWidth = '90%';
-      notification.style.textAlign = 'center';
-      
-      document.body.appendChild(notification);
-      
-      setTimeout(() => {
-        notification.remove();
-      }, duration);
+    function showResult(text, ok=false){
+      resultMessageEl.textContent = text;
+      resultMessageEl.className = ok ? 'success' : 'error';
     }
-    
-    // Copy referral link
-    document.getElementById('copyReferralLink').addEventListener('click', () => {
-      const link = document.getElementById('referralLink').textContent;
-      navigator.clipboard.writeText(link).then(() => {
-        notify('Referral link copied to clipboard!');
-      });
-    });
-    
-    // View referrals
-    document.getElementById('viewReferralsBtn').addEventListener('click', () => {
-      showReferralList();
-    });
-    
-    // Close modal
-    document.getElementById('closeReferralModal').addEventListener('click', () => {
-      document.getElementById('referralModal').style.display = 'none';
-    });
-    
-    // Show referral list
-    function showReferralList() {
-      const modal = document.getElementById('referralModal');
-      const content = document.getElementById('referralListContent');
-      
-      // In a real implementation, you would fetch this data from your backend
-      // For demo purposes, we'll use mock data
-      const mockReferrals = [
-        {
-          id: '123456789',
-          name: 'John Doe',
-          avatar: 'https://via.placeholder.com/56',
-          balance: 15000,
-          commission: 3000
-        },
-        {
-          id: '987654321',
-          name: 'Jane Smith',
-          avatar: 'https://via.placeholder.com/56',
-          balance: 8000,
-          commission: 1600
-        },
-        {
-          id: '456789123',
-          name: 'Bob Johnson',
-          avatar: 'https://via.placeholder.com/56',
-          balance: 12000,
-          commission: 2400
+    function clearResult(){
+      resultMessageEl.textContent = '';
+      resultMessageEl.className = '';
+    }
+
+    // ----------------------------------------------------
+    // Telegram WebApp compatibility
+    // ----------------------------------------------------
+    function telegramSafeReady(){
+      try{
+        if(window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.ready === 'function'){
+          window.Telegram.WebApp.ready();
+          // Optionally expand the Telegram WebApp to show more UI
+          if(typeof window.Telegram.WebApp.expand === 'function'){
+            window.Telegram.WebApp.expand();
+          }
         }
-      ];
-      
-      if (mockReferrals.length === 0) {
-        content.innerHTML = '<div style="text-align: center; padding: 40px 20px; color: rgba(255, 255, 255, 0.7); font-size: 14px;">You haven\'t referred anyone yet. Share your referral link to start earning!</div>';
-      } else {
-        let html = '';
-        mockReferrals.forEach(referral => {
-          html += `
-            <div class="referral-list-item">
-              <img src="${referral.avatar}" class="referral-list-avatar" alt="${referral.name}" />
-              <div class="referral-list-info">
-                <div class="referral-list-name">${referral.name}</div>
-                <div class="referral-list-id">ID: ${referral.id}</div>
-                <div class="referral-list-balance">${referral.balance} SHB</div>
-                <div class="referral-commission">🤝 Commission: ${referral.commission} SHB</div>
-              </div>
-            </div>
-          `;
-        });
-        content.innerHTML = html;
+      }catch(e){
+        // ignore
       }
-      
-      modal.style.display = 'flex';
     }
-    
-    // Award Referral Commission
-    function awardReferralCommission(earnedAmount) {
-      // This function would be called when a referred user earns coins
-      // It would calculate the commission (20% in this case) and add it to the referrer's balance
-      
-      if (!userData.referredBy) {
-        console.log('No referrer for this user');
+
+    // ----------------------------------------------------
+    // TON Connect integration
+    // ----------------------------------------------------
+    // Ensure TonConnect SDK is available
+    if(typeof TonConnect === 'undefined'){
+      setStatus('TonConnect SDK not loaded', 'err');
+      showResult('TonConnect SDK failed to load. Check network or SDK URL.');
+      console.error('TonConnect SDK is missing.');
+    }
+
+    // Create TonConnect instance with manifest (important)
+    const tonConnect = new TonConnect({
+      manifestUrl: MANIFEST_URL
+    });
+
+    // When a wallet session gets connected, sdk stores session in local storage internally
+    // We'll read the selected account from the session object if present.
+    async function updateConnectedFromSession(){
+      // First, check local storage for previously saved address
+      const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if(stored){
+        walletAddressEl.textContent = stored;
+        setStatus('Connected (cached)', 'ok');
+        connectBtn.textContent = 'Connected';
+        connectBtn.disabled = false;
         return;
       }
-      
-      const commission = Math.floor(earnedAmount * 0.2); // 20% commission
-      const referrerId = userData.referredBy;
-      
-      console.log(`Awarding ${commission} SHB commission to referrer ${referrerId} for ${earnedAmount} SHB earned`);
-      
-      // In a real implementation, you would update the referrer's balance in your database
-      // and log the commission transaction
-      
-      return commission;
-    }
-    
-    // Process Referral
-    function processReferral(startParam) {
-      return new Promise((resolve) => {
-        if (!startParam) {
-          console.log('No referral parameter found');
-          resolve();
+
+      // TonConnect exposes 'account' property when connected
+      // Note: UMD TonConnect may expose current session at tonConnect.account
+      try{
+        if(tonConnect.account && tonConnect.account.address){
+          const addr = tonConnect.account.address;
+          walletAddressEl.textContent = addr;
+          localStorage.setItem(LOCAL_STORAGE_KEY, addr);
+          setStatus('Connected', 'ok');
+          connectBtn.textContent = 'Connected';
           return;
         }
-        
-        let referrerId = startParam;
-        
-        if (referrerId && referrerId !== userId) {
-          // Check if user was already referred
-          // In a real implementation, you would check this in your database
-          
-          console.log('Processing new referral...');
-          
-          // Show referral welcome screen
-          showReferralWelcome(referrerId).then(() => {
-            // Award referrer bonus (5000 SHB in this case)
-            console.log('Referrer awarded 5000 SHB bonus');
-            
-            // Save referral relationship
-            console.log('Referral link saved for user');
-            
-            notify('Welcome! Your referrer earned 5000 SHB!', 3000);
-            resolve();
-          });
-        } else {
-          resolve();
+      }catch(e){
+        // ignore
+      }
+
+      walletAddressEl.textContent = 'Not connected';
+      setStatus('Idle');
+      connectBtn.textContent = 'Connect TON Wallet';
+    }
+
+    // Connect button handler
+    connectBtn.addEventListener('click', async function(){
+      clearResult();
+      try{
+        setStatus('Connecting...');
+        // TonConnect.connect() opens the wallet selection UI (if needed)
+        // It returns a session object when successful.
+        const session = await tonConnect.connect();
+        // session.accounts is an array of connected account objects; take first.
+        const address = (session && session.account && session.account.address) ||
+                        (session && session.accounts && session.accounts[0] && session.accounts[0].address) ||
+                        (tonConnect.account && tonConnect.account.address) || null;
+
+        if(address){
+          walletAddressEl.textContent = address;
+          localStorage.setItem(LOCAL_STORAGE_KEY, address);
+          setStatus('Connected', 'ok');
+          connectBtn.textContent = 'Connected';
+          connectBtn.disabled = false;
+          // If inside Telegram WebApp, inform Telegram that we have a connected user (optional)
+          try{ telegramSafeReady(); }catch(e){}
+        }else{
+          // Some wallets return session differently; handle generically.
+          walletAddressEl.textContent = 'Connected';
+          setStatus('Connected', 'ok');
+          connectBtn.textContent = 'Connected';
         }
-      });
-    }
-    
-    // Show Referral Welcome Screen
-    function showReferralWelcome(referrerId) {
-      return new Promise((resolve) => {
-        // In a real implementation, you would fetch the referrer's data from your database
-        // For demo purposes, we'll use mock data
-        const mockReferrerData = {
-          name: 'Referrer Name',
-          avatar: 'https://via.placeholder.com/48'
-        };
-        
-        // Create welcome screen
-        const welcomeScreen = document.createElement('div');
-        welcomeScreen.style.position = 'fixed';
-        welcomeScreen.style.top = '0';
-        welcomeScreen.style.left = '0';
-        welcomeScreen.style.width = '100vw';
-        welcomeScreen.style.height = '100vh';
-        welcomeScreen.style.background = 'linear-gradient(135deg, #1A1A2E 0%, #16213E 30%, #0F3460 70%, #533483 100%)';
-        welcomeScreen.style.display = 'flex';
-        welcomeScreen.style.flexDirection = 'column';
-        welcomeScreen.style.alignItems = 'center';
-        welcomeScreen.style.justifyContent = 'center';
-        welcomeScreen.style.zIndex = '9998';
-        welcomeScreen.style.padding = '20px';
-        
-        welcomeScreen.innerHTML = `
-          <div class="welcome-card">
-            <div class="welcome-icon">🎉</div>
-            <div class="welcome-title">Welcome!</div>
-            <div class="welcome-message">You've been invited to join Shark Bounty</div>
-            <div class="referrer-info">
-              <div class="referrer-label">Your Referrer</div>
-              <div class="referrer-details">
-                <img src="${mockReferrerData.avatar}" class="referrer-avatar" alt="Referrer" />
-                <div>
-                  <div class="referrer-name">${mockReferrerData.name}</div>
-                  <div class="referrer-id">ID: ${referrerId}</div>
-                </div>
-              </div>
-            </div>
-            <div class="welcome-countdown" id="welcomeCountdown">Starting in 5 seconds...</div>
-          </div>
-        `;
-        
-        document.body.appendChild(welcomeScreen);
-        
-        let countdown = 5;
-        const countdownEl = document.getElementById('welcomeCountdown');
-        
-        const countdownInterval = setInterval(() => {
-          countdown--;
-          if (countdown > 0) {
-            countdownEl.textContent = `Starting in ${countdown} seconds...`;
-          } else {
-            clearInterval(countdownInterval);
-            document.body.removeChild(welcomeScreen);
-            resolve();
+      }catch(err){
+        console.error('Connection failed', err);
+        setStatus('Connection failed', 'err');
+        showResult('Connection canceled or failed.');
+      }
+    });
+
+    // Payment function: sends a transfer request via TonConnect
+    async function sendPayment(){
+      clearResult();
+      // Ensure wallet connected
+      let addr = localStorage.getItem(LOCAL_STORAGE_KEY) || (tonConnect.account && tonConnect.account.address);
+      if(!addr){
+        showResult('Please connect a TON wallet first.');
+        return;
+      }
+
+      // Build a transfer message compliant with TonConnect
+      const transfer = {
+        // validUntil in seconds (optional). We'll set for 5 minutes from now.
+        validUntil: Math.floor(Date.now() / 1000) + 60 * 5,
+        messages: [
+          {
+            // type 'transfer' used by many tonconnect-compatible wallets
+            type: 'transfer',
+            to: RECEIVER_ADDRESS,
+            amount: MIN_NANO,
+            // optional text/payload
+            text: `Deposit ${MIN_TON} TON — Midnight Flicks`
           }
-        }, 1000);
-      });
+        ]
+      };
+
+      try{
+        setStatus('Requesting payment...');
+        // tonConnect.sendTransaction is the recommended method in TonConnect SDK
+        // It returns a promise which resolves after wallet accepts/sends the transaction
+        // Some SDK versions use tonConnect.sendTransaction(transfer) directly
+        // Use the safe-call pattern to support multiple SDK versions:
+        let res;
+        if(typeof tonConnect.sendTransaction === 'function'){
+          res = await tonConnect.sendTransaction(transfer);
+        }else if(typeof tonConnect.requestTransfer === 'function'){
+          // fallback names (if any)
+          res = await tonConnect.requestTransfer(transfer);
+        }else if(typeof tonConnect.provider === 'object' && typeof tonConnect.provider.postMessage === 'function'){
+          // Very defensive fallback: try request through provider (rare)
+          res = await tonConnect.request(transfer);
+        }else{
+          throw new Error('TonConnect sendTransaction API not found in SDK.');
+        }
+
+        // If no thrown error, consider it successful. Some wallets may return a result object.
+        console.log('TonConnect transfer response:', res);
+
+        // Show success to user
+        setStatus('Payment sent', 'ok');
+        showResult('Payment Successful', true);
+
+        // Optionally, update UI or store that user paid (client-only)
+        localStorage.setItem('midnight_flicks_paid', '1');
+
+      }catch(err){
+        console.error('Payment failed or canceled', err);
+        setStatus('Payment failed', 'err');
+        showResult('Payment failed or canceled.');
+      }
     }
-    
-    // Initialize
-    document.getElementById('referralLink').textContent = `https://t.me/YourBotName/myapp?startapp=${userId}`;
-    document.getElementById('referralCount').textContent = referralCount;
-    document.getElementById('referralEarnings').textContent = (referralCount * 5000) + totalReferralCommission;
-    
-    // In a real implementation, you would also set up listeners to update the referral count and earnings
-    // when new referrals are added or when commissions are earned
+
+    // Hook up pay button
+    payBtn.addEventListener('click', async function(){
+      // Disable button briefly to prevent double clicks
+      payBtn.disabled = true;
+      payBtn.style.opacity = '0.9';
+      await sendPayment();
+      setTimeout(()=>{ payBtn.disabled = false; payBtn.style.opacity = '1'; }, 600);
+    });
+
+    // On load: try to read persisted address and update UI
+    (async function init(){
+      // Ensure Telegram WebApp ready if present
+      telegramSafeReady();
+
+      // If a cached address exists, show it
+      const cached = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if(cached){
+        walletAddressEl.textContent = cached;
+        setStatus('Connected (cached)', 'ok');
+        connectBtn.textContent = 'Connected';
+      } else {
+        // Try to read tonConnect.session/account if available (e.g., wallet restored)
+        try{ await updateConnectedFromSession(); }catch(e){}
+      }
+
+      // Listen for TonConnect events: when session appears/disappears
+      try{
+        if(typeof tonConnect.on === 'function'){
+          tonConnect.on('connect', (session) => {
+            const addr = (session && session.account && session.account.address) ||
+                         (session && session.accounts && session.accounts[0] && session.accounts[0].address);
+            if(addr){
+              localStorage.setItem(LOCAL_STORAGE_KEY, addr);
+              walletAddressEl.textContent = addr;
+              setStatus('Connected', 'ok');
+              connectBtn.textContent = 'Connected';
+            }
+          });
+          tonConnect.on('disconnect', () => {
+            localStorage.removeItem(LOCAL_STORAGE_KEY);
+            walletAddressEl.textContent = 'Not connected';
+            setStatus('Idle');
+            connectBtn.textContent = 'Connect TON Wallet';
+          });
+        }
+      }catch(e){
+        // Some SDK versions may not support on(); ignore gracefully
+      }
+    })();
   </script>
 </body>
 </html>
