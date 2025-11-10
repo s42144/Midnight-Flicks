@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WinArena - Admin Panel</title>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <div id="adminApp">
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="spinner"></div>
+            <p>Loading Admin Panel...</p>
+        </div>
+
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-left">
+                <h1>WinArena Admin</h1>
+                <span class="admin-role">Administrator</span>
+            </div>
+            <div class="header-right">
+                <div class="admin-info">
+                    <img id="adminAvatar" src="" alt="Admin">
+                    <div class="admin-details">
+                        <span id="adminName">Admin User</span>
+                        <button onclick="logoutAdmin()" class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-section="users">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </button>
+                <button class="nav-item" data-section="games">
+                    <i class="fas fa-gamepad"></i>
+                    <span>Games</span>
+                </button>
+                <button class="nav-item" data-section="tasks">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tasks</span>
+                </button>
+                <button class="nav-item" data-section="transactions">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Transactions</span>
+                </button>
+                <button class="nav-item" data-section="posts">
+                    <i class="fas fa-newspaper"></i>
+                    <span>Posts</span>
+                </button>
+                <button class="nav-item" data-section="referrals">
+                    <i class="fas fa-user-friends"></i>
+                    <span>Referrals</span>
+                </button>
+                <button class="nav-item" data-section="statistics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistics</span>
+                </button>
+                <button class="nav-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </button>
+                <button class="nav-item" data-section="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboardSection" class="content-section active">
+                <div class="section-header">
+                    <h2>Dashboard</h2>
+                    <div class="time-info">
+                        <span id="currentTime"></span>
+                        <span id="currentDate"></span>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="totalUsers">0</h3>
+                            <p>Total Users</p>
+                            <span class="stat-change positive">+12.5%</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="totalBTX">0</h3>
+                            <p>Total BTX Supply</p>
+                            <span class="stat-change positive">+8.3%</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="dailyRevenue">0</h3>
+                            <p>Today's Revenue</p>
+                            <span class="stat-change positive">+15.7%</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="activeUsers">0</h3>
+                            <p>Active Users</p>
+                            <span class="stat-change negative">-2.1%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-charts">
+                    <div class="chart-container">
+                        <h3>User Growth</h3>
+                        <canvas id="userGrowthChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Revenue Trends</h3>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="recent-activities">
+                    <h3>Recent Activities</h3>
+                    <div class="activity-list" id="recentActivities">
+                        <!-- Activities will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Users Section -->
+            <section id="usersSection" class="content-section">
+                <div class="section-header">
+                    <h2>User Management</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary" onclick="addUser()">
+                            <i class="fas fa-plus"></i>
+                            Add User
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportUsers()">
+                            <i class="fas fa-download"></i>
+                            Export
+                        </button>
+                    </div>
+                </div>
+
+                <div class="search-filters">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="userSearch" placeholder="Search users...">
+                    </div>
+                    <select id="userFilter">
+                        <option value="all">All Users</option>
+                        <option value="active">Active</option>
+                        <option value="banned">Banned</option>
+                        <option value="new">New Users</option>
+                        <option value="vip">VIP</option>
+                    </select>
+                    <select id="userSort">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="balance">Highest Balance</option>
+                        <option value="referrals">Most Referrals</option>
+                    </select>
+                </div>
+
+                <div class="users-table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Balance</th>
+                                <th>Referrals</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                                <th>Last Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Users will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    <button class="btn btn-secondary" onclick="previousPage()" id="prevBtn">Previous</button>
+                    <span id="pageInfo">Page 1 of 1</span>
+                    <button class="btn btn-secondary" onclick="nextPage()" id="nextBtn">Next</button>
+                </div>
+            </section>
+
+            <!-- Games Section -->
+            <section id="gamesSection" class="content-section">
+                <div class="section-header">
+                    <h2>Games Management</h2>
+                    <button class="btn btn-primary" onclick="addGame()">
+                        <i class="fas fa-plus"></i>
+                        Add Game
+                    </button>
+                </div>
+
+                <div class="games-grid" id="gamesGrid">
+                    <!-- Games will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Tasks Section -->
+            <section id="tasksSection" class="content-section">
+                <div class="section-header">
+                    <h2>Tasks Management</h2>
+                    <button class="btn btn-primary" onclick="addTask()">
+                        <i class="fas fa-plus"></i>
+                        Add Task
+                    </button>
+                </div>
+
+                <div class="tasks-list" id="tasksList">
+                    <!-- Tasks will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Transactions Section -->
+            <section id="transactionsSection" class="content-section">
+                <div class="section-header">
+                    <h2>Transaction Management</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary" onclick="showDeposits()">
+                            Deposits
+                        </button>
+                        <button class="btn btn-warning" onclick="showWithdrawals()">
+                            Withdrawals
+                        </button>
+                    </div>
+                </div>
+
+                <div class="transactions-tabs">
+                    <button class="tab-btn active" data-tab="pending">Pending</button>
+                    <button class="tab-btn" data-tab="approved">Approved</button>
+                    <button class="tab-btn" data-tab="rejected">Rejected</button>
+                </div>
+
+                <div class="transactions-list" id="transactionsList">
+                    <!-- Transactions will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Posts Section -->
+            <section id="postsSection" class="content-section">
+                <div class="section-header">
+                    <h2>Posts Management</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-danger" onclick="deleteAllPosts()">
+                            <i class="fas fa-trash"></i>
+                            Delete All
+                        </button>
+                    </div>
+                </div>
+
+                <div class="posts-list" id="postsList">
+                    <!-- Posts will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Referrals Section -->
+            <section id="referralsSection" class="content-section">
+                <div class="section-header">
+                    <h2>Referral Analytics</h2>
+                    <button class="btn btn-secondary" onclick="exportReferrals()">
+                        <i class="fas fa-download"></i>
+                        Export Data
+                    </button>
+                </div>
+
+                <div class="referral-stats">
+                    <div class="referral-card">
+                        <h3>Total Referrals</h3>
+                        <span id="totalReferrals">0</span>
+                    </div>
+                    <div class="referral-card">
+                        <h3>Commission Paid</h3>
+                        <span id="commissionPaid">0 BTX</span>
+                    </div>
+                    <div class="referral-card">
+                        <h3>Active Referrers</h3>
+                        <span id="activeReferrers">0</span>
+                    </div>
+                </div>
+
+                <div class="referral-leaderboard">
+                    <h3>Top Referrers</h3>
+                    <div class="leaderboard-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>User</th>
+                                    <th>Referrals</th>
+                                    <th>Earnings</th>
+                                </tr>
+                            </thead>
+                            <tbody id="referralLeaderboardBody">
+                                <!-- Leaderboard will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Statistics Section -->
+            <section id="statisticsSection" class="content-section">
+                <div class="section-header">
+                    <h2>Statistics & Analytics</h2>
+                    <div class="date-range">
+                        <input type="date" id="startDate">
+                        <span>to</span>
+                        <input type="date" id="endDate">
+                        <button class="btn btn-primary" onclick="updateStatistics()">Apply</button>
+                    </div>
+                </div>
+
+                <div class="stats-overview">
+                    <div class="overview-card">
+                        <h3>Daily Statistics</h3>
+                        <div class="stat-item">
+                            <span>New Users:</span>
+                            <strong id="dailyNewUsers">0</strong>
+                        </div>
+                        <div class="stat-item">
+                            <span>Revenue:</span>
+                            <strong id="dailyRevenue">0 BTX</strong>
+                        </div>
+                        <div class="stat-item">
+                            <span>Deposits:</span>
+                            <strong id="dailyDeposits">0</strong>
+                        </div>
+                        <div class="stat-item">
+                            <span>Withdrawals:</span>
+                            <strong id="dailyWithdrawals">0</strong>
+                        </div>
+                    </div>
+
+                    <div class="overview-card">
+                        <h3>Weekly Statistics</h3>
+                        <div class="stat-item">
+                            <span>New Users:</span>
+                            <strong id="weeklyNewUsers">0</strong>
+                        </div>
+                        <div class="stat-item">
+                            <span>Revenue:</span>
+                            <strong id="weeklyRevenue">0 BTX</strong>
+                        </div>
+                        <div class="stat-item">
+                            <span>Deposits:</span>
+                            <strong id="weeklyDeposits">0</strong>
+                        </div>
+                        <div class="stat-item">
+                            <span>Withdrawals:</span>
+                            <strong id="weeklyWithdrawals">0</strong>
+                        </div>
+                    </div>
+
+                    <div class="overview-card">
+                        <h3>Monthly Statistics</h3>
+                        <div class="stat-item">
+                            <span>New Users:</span>
+                            <strong id="monthlyNewUsers">0</strong>
+                        </div>
+                        <div class="stat-item">
+                            <span>Revenue:</span>
+                            <strong id="monthlyRevenue">0 BTX</strong>
+                        </div>
+                        <div class="stat-item">
+                            <span>Deposits:</span>
+                            <strong id="monthlyDeposits">0</strong>
+                        </div>
+                        <div class="stat-item">
+                            <span>Withdrawals:</span>
+                            <strong id="monthlyWithdrawals">0</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-section">
+                    <div class="chart-container">
+                        <h3>User Activity</h3>
+                        <canvas id="userActivityChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Earnings Breakdown</h3>
+                        <canvas id="earningsChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settingsSection" class="content-section">
+                <div class="section-header">
+                    <h2>System Settings</h2>
+                    <button class="btn btn-success" onclick="saveSettings()">
+                        <i class="fas fa-save"></i>
+                        Save Changes
+                    </button>
+                </div>
+
+                <div class="settings-tabs">
+                    <button class="tab-btn active" data-tab="general">General</button>
+                    <button class="tab-btn" data-tab="wallet">Wallet</button>
+                    <button class="tab-btn" data-tab="firebase">Firebase</button>
+                    <button class="tab-btn" data-tab="bot">Bot</button>
+                </div>
+
+                <div class="settings-content">
+                    <!-- General Settings -->
+                    <div id="generalSettings" class="settings-panel active">
+                        <div class="setting-group">
+                            <h3>App Configuration</h3>
+                            <div class="form-group">
+                                <label>App Name</label>
+                                <input type="text" id="appName" value="WinArena">
+                            </div>
+                            <div class="form-group">
+                                <label>App Version</label>
+                                <input type="text" id="appVersion" value="1.0.0">
+                            </div>
+                            <div class="form-group">
+                                <label>Maintenance Mode</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="maintenanceMode">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="setting-group">
+                            <h3>Rates & Limits</h3>
+                            <div class="form-group">
+                                <label>TON to BTX Rate</label>
+                                <input type="number" id="tonToBtxRate" value="500">
+                            </div>
+                            <div class="form-group">
+                                <label>Minimum Deposit (TON)</label>
+                                <input type="number" id="minDeposit" value="1" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>Minimum Withdrawal (BTX)</label>
+                                <input type="number" id="minWithdraw" value="250">
+                            </div>
+                            <div class="form-group">
+                                <label>Ad Reward (BTX)</label>
+                                <input type="number" id="adReward" value="0.1" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label>Referral Reward (BTX)</label>
+                                <input type="number" id="referralReward" value="10">
+                            </div>
+                            <div class="form-group">
+                                <label>Referral Commission (%)</label>
+                                <input type="number" id="referralCommission" value="20" step="0.1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wallet Settings -->
+                    <div id="walletSettings" class="settings-panel">
+                        <div class="setting-group">
+                            <h3>TON Wallet Configuration</h3>
+                            <div class="form-group">
+                                <label>Admin TON Wallet Address</label>
+                                <input type="text" id="adminTonWallet" placeholder="Enter TON wallet address">
+                            </div>
+                            <div class="form-group">
+                                <label>Auto-approve Withdrawals</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="autoApproveWithdrawals">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>Max Withdrawal per Day (BTX)</label>
+                                <input type="number" id="maxWithdrawalPerDay" value="10000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Firebase Settings -->
+                    <div id="firebaseSettings" class="settings-panel">
+                        <div class="setting-group">
+                            <h3>Firebase Configuration</h3>
+                            <div class="form-group">
+                                <label>API Key</label>
+                                <input type="text" id="firebaseApiKey" placeholder="Enter Firebase API key">
+                            </div>
+                            <div class="form-group">
+                                <label>Auth Domain</label>
+                                <input type="text" id="firebaseAuthDomain" placeholder="project.firebaseapp.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Database URL</label>
+                                <input type="text" id="firebaseDatabaseUrl" placeholder="https://project.firebaseio.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Project ID</label>
+                                <input type="text" id="firebaseProjectId" placeholder="your-project-id">
+                            </div>
+                            <div class="form-group">
+                                <label>Storage Bucket</label>
+                                <input type="text" id="firebaseStorageBucket" placeholder="project.appspot.com">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bot Settings -->
+                    <div id="botSettings" class="settings-panel">
+                        <div class="setting-group">
+                            <h3>Telegram Bot Configuration</h3>
+                            <div class="form-group">
+                                <label>Bot Token</label>
+                                <input type="text" id="botToken" placeholder="Enter bot token">
+                            </div>
+                            <div class="form-group">
+                                <label>Notification Channel</label>
+                                <input type="text" id="notificationChannel" placeholder="@your_channel">
+                            </div>
+                            <div class="form-group">
+                                <label>Enable Notifications</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="enableNotifications" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notifications Section -->
+            <section id="notificationsSection" class="content-section">
+                <div class="section-header">
+                    <h2>Notifications & Broadcasts</h2>
+                </div>
+
+                <div class="notification-form">
+                    <h3>Send Broadcast Message</h3>
+                    <div class="form-group">
+                        <label>Message Type</label>
+                        <select id="notificationType">
+                            <option value="info">Information</option>
+                            <option value="success">Success</option>
+                            <option value="warning">Warning</option>
+                            <option value="error">Error</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Message Text</label>
+                        <textarea id="broadcastMessage" placeholder="Enter your message..." rows="4"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Attach Image (Optional)</label>
+                        <input type="file" id="notificationImage" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label>Target Users</label>
+                        <select id="targetUsers">
+                            <option value="all">All Users</option>
+                            <option value="active">Active Users Only</option>
+                            <option value="vip">VIP Users Only</option>
+                            <option value="custom">Custom Selection</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="sendBroadcast()">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Broadcast
+                    </button>
+                </div>
+
+                <div class="notification-history">
+                    <h3>Recent Broadcasts</h3>
+                    <div class="broadcast-list" id="broadcastList">
+                        <!-- Broadcasts will be loaded here -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- User Details Modal -->
+    <div id="userDetailsModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>User Details</h3>
+                <button class="close-btn" onclick="closeModal('userDetailsModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="userDetailsContent">
+                <!-- User details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Game/Edit Modal -->
+    <div id="gameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="gameModalTitle">Add Game</h3>
+                <button class="close-btn" onclick="closeModal('gameModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Game Title</label>
+                    <input type="text" id="gameTitle" placeholder="Enter game title">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="gameDescription" placeholder="Enter game description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="gameCategory">
+                        <option value="action">Action</option>
+                        <option value="puzzle">Puzzle</option>
+                        <option value="strategy">Strategy</option>
+                        <option value="casual">Casual</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Game URL</label>
+                    <input type="url" id="gameUrl" placeholder="https://example.com/game">
+                </div>
+                <div class="form-group">
+                    <label>Game Image</label>
+                    <input type="file" id="gameImage" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label>Sort Order</label>
+                    <input type="number" id="gameSortOrder" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="gameStatus">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="saveGame()">Save Game</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task/Edit Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="taskModalTitle">Add Task</h3>
+                <button class="close-btn" onclick="closeModal('taskModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Task Title</label>
+                    <input type="text" id="taskTitle" placeholder="Enter task title">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="taskDescription" placeholder="Enter task description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Task Link</label>
+                    <input type="url" id="taskLink" placeholder="https://example.com/task">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="taskCategory">
+                        <option value="project">Project</option>
+                        <option value="partners">Partners</option>
+                        <option value="advertise">Advertise</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Reward (BTX)</label>
+                    <input type="number" id="taskReward" placeholder="Enter reward amount" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Task Image</label>
+                    <input type="file" id="taskImage" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label>Sort Order</label>
+                    <input type="number" id="taskSortOrder" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="taskStatus">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="saveTask()">Save Task</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="adminNotification" class="notification">
+        <span id="adminNotificationMessage"></span>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Admin Script -->
+    <script src="admin.js"></script>
+</body>
+</html>
