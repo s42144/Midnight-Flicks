@@ -3,424 +3,3539 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WinArena - Telegram Mini App</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
-</head>
-<body>
-    <div id="app">
-        <!-- Daily Check-in Modal -->
-        <div id="dailyCheckInModal" class="modal">
-            <div class="modal-content">
-                <div class="checkin-header">
-                    <h2>Daily Check-in!</h2>
-                    <button class="close-btn" onclick="closeDailyCheckIn()">&times;</button>
-                </div>
-                <div class="checkin-content">
-                    <div class="checkin-progress">
-                        <div class="day-streak">
-                            <div class="day" data-day="1">1</div>
-                            <div class="day" data-day="2">2</div>
-                            <div class="day" data-day="3">3</div>
-                            <div class="day" data-day="4">4</div>
-                            <div class="day" data-day="5">5</div>
-                            <div class="day" data-day="6">6</div>
-                            <div class="day" data-day="7">7</div>
-                        </div>
-                    </div>
-                    <div class="reward-info">
-                        <h3 id="checkinReward">Today's Reward: 1 BTX</h3>
-                        <p>Keep your streak alive!</p>
-                    </div>
-                    <button class="claim-btn" onclick="claimDailyReward()">Claim Reward</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Content Container -->
-        <div class="main-container">
-            <!-- Home Screen -->
-            <div id="homeScreen" class="screen active">
-                <div class="header">
-                    <h1>WinArena</h1>
-                    <div class="user-info">
-                        <img id="userAvatar" src="" alt="User">
-                        <div class="balance-display">
-                            <i class="fas fa-coins"></i>
-                            <span id="userBalance">0</span> BTX
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="search-section">
-                    <div class="search-bar">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="gameSearch" placeholder="Search games...">
-                    </div>
-                </div>
-
-                <div class="category-section">
-                    <h3>Categories</h3>
-                    <div class="category-filters">
-                        <button class="category-btn active" data-category="all">All</button>
-                        <button class="category-btn" data-category="action">Action</button>
-                        <button class="category-btn" data-category="puzzle">Puzzle</button>
-                        <button class="category-btn" data-category="strategy">Strategy</button>
-                        <button class="category-btn" data-category="casual">Casual</button>
-                    </div>
-                </div>
-
-                <div class="sort-section">
-                    <select id="sortGames">
-                        <option value="top">Top Rated</option>
-                        <option value="new">New</option>
-                        <option value="trending">Trending</option>
-                    </select>
-                </div>
-
-                <div class="games-grid" id="gamesList">
-                    <!-- Games will be dynamically loaded here -->
-                </div>
-            </div>
-
-            <!-- Discover Screen -->
-            <div id="discoverScreen" class="screen">
-                <div class="header">
-                    <h1>Discover</h1>
-                    <button class="create-post-btn" onclick="showCreatePost()">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-                
-                <div class="posts-container" id="postsContainer">
-                    <!-- Posts will be dynamically loaded here -->
-                </div>
-            </div>
-
-            <!-- Wallet Screen -->
-            <div id="walletScreen" class="screen">
-                <div class="header">
-                    <h1>Wallet</h1>
-                    <div class="wallet-balance">
-                        <i class="fas fa-coins"></i>
-                        <span id="walletBalance">0</span> BTX
-                    </div>
-                </div>
-                
-                <div class="wallet-options">
-                    <button class="wallet-btn" onclick="showDeposit()">
-                        <i class="fas fa-arrow-down"></i>
-                        <span>Deposit</span>
-                    </button>
-                    <button class="wallet-btn" onclick="showWithdraw()">
-                        <i class="fas fa-arrow-up"></i>
-                        <span>Withdraw</span>
-                    </button>
-                    <button class="wallet-btn" onclick="showHistory()">
-                        <i class="fas fa-history"></i>
-                        <span>History</span>
-                    </button>
-                </div>
-
-                <div id="depositSection" class="wallet-section hidden">
-                    <h3>Deposit TON</h3>
-                    <p>1 TON = 500 BTX</p>
-                    <div class="input-group">
-                        <input type="number" id="depositAmount" placeholder="Enter TON amount" min="1" step="0.1">
-                        <div class="conversion-info">
-                            <span id="btxReceive">0 BTX</span>
-                        </div>
-                    </div>
-                    <button class="action-btn" onclick="confirmDeposit()">Confirm Deposit</button>
-                </div>
-
-                <div id="withdrawSection" class="wallet-section hidden">
-                    <h3>Withdraw BTX</h3>
-                    <p>Minimum: 250 BTX</p>
-                    <div class="input-group">
-                        <input type="number" id="withdrawAmount" placeholder="Enter BTX amount" min="250" step="10">
-                        <div class="wallet-status" id="walletStatus">
-                            <p>Connect TON wallet first</p>
-                        </div>
-                    </div>
-                    <button class="action-btn" onclick="confirmWithdraw()" id="withdrawBtn" disabled>Request Withdrawal</button>
-                </div>
-
-                <div id="historySection" class="wallet-section hidden">
-                    <h3>Transaction History</h3>
-                    <div class="history-filters">
-                        <select id="historyFilter">
-                            <option value="all">All</option>
-                            <option value="deposit">Deposits</option>
-                            <option value="withdraw">Withdrawals</option>
-                        </select>
-                    </div>
-                    <div class="history-list" id="historyList">
-                        <!-- History items will be loaded here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Earn Screen -->
-            <div id="earnScreen" class="screen">
-                <div class="header">
-                    <h1>Earn</h1>
-                </div>
-                
-                <div class="earn-stats">
-                    <div class="stat-card">
-                        <i class="fas fa-eye"></i>
-                        <div>
-                            <p>Today Watched</p>
-                            <span id="todayWatched">0</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-calendar-week"></i>
-                        <div>
-                            <p>This Week</p>
-                            <span id="weekWatched">0</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-trophy"></i>
-                        <div>
-                            <p>Lifetime</p>
-                            <span id="lifetimeWatched">0</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="ads-section">
-                    <h3>Watch Ads & Earn</h3>
-                    <p>Watch ads to earn 0.10 BTX each</p>
-                    <button class="watch-ads-btn" onclick="watchAd()">
-                        <i class="fas fa-play"></i>
-                        Watch Ads
-                    </button>
-                    <div id="adsContainer" class="ads-container">
-                        <!-- Monetag ads will be loaded here -->
-                    </div>
-                </div>
-
-                <div class="tasks-section">
-                    <h3>Complete Tasks</h3>
-                    <div class="tasks-container" id="tasksContainer">
-                        <!-- Tasks will be dynamically loaded here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Referral Screen -->
-            <div id="referralScreen" class="screen">
-                <div class="header">
-                    <h1>Referrals</h1>
-                </div>
-                
-                <div class="referral-info">
-                    <div class="referral-link-box">
-                        <h3>Your Referral Link</h3>
-                        <div class="link-input-group">
-                            <input type="text" id="referralLink" readonly>
-                            <button onclick="copyReferralLink()">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="referral-stats">
-                        <div class="stat-item">
-                            <span>Total Referred</span>
-                            <strong id="totalReferred">0</strong>
-                        </div>
-                        <div class="stat-item">
-                            <span>Commission Earned</span>
-                            <strong id="commissionEarned">0 BTX</strong>
-                        </div>
-                        <div class="stat-item">
-                            <span>Active Referrals</span>
-                            <strong id="activeReferrals">0</strong>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="leaderboard-section">
-                    <h3>Top Referrers (24h)</h3>
-                    <div class="leaderboard-list" id="leaderboardList">
-                        <!-- Leaderboard will be loaded here -->
-                    </div>
-                </div>
-
-                <div class="referral-list-section">
-                    <h3>Your Referrals</h3>
-                    <div class="referral-list" id="referralList">
-                        <!-- Referral list will be loaded here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Profile Screen -->
-            <div id="profileScreen" class="screen">
-                <div class="header">
-                    <h1>Profile</h1>
-                </div>
-                
-                <div class="profile-info">
-                    <img id="profileAvatar" src="" alt="Profile">
-                    <h2 id="profileName">User</h2>
-                    <p>Telegram User</p>
-                    <div class="user-id-box">
-                        <span>ID: <strong id="userId"></strong></span>
-                        <button onclick="copyUserId()">
-                            <i class="fas fa-copy"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="settings-section">
-                    <h3>Settings</h3>
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <i class="fas fa-volume-up"></i>
-                            <span>Sound</span>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="soundToggle" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <i class="fas fa-wallet"></i>
-                            <span>TON Wallet</span>
-                        </div>
-                        <div class="wallet-actions">
-                            <button id="connectWalletBtn" onclick="connectTONWallet()">Connect</button>
-                            <button id="disconnectWalletBtn" onclick="disconnectTONWallet()" class="hidden">Disconnect</button>
-                        </div>
-                    </div>
-
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <i class="fas fa-moon"></i>
-                            <span>Dark Mode</span>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="darkModeToggle">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-
-                    <div class="setting-item danger">
-                        <div class="setting-info">
-                            <i class="fas fa-trash"></i>
-                            <span>Delete Account</span>
-                        </div>
-                        <button onclick="deleteAccount()" class="danger-btn">Delete</button>
-                    </div>
-                </div>
-
-                <div class="badges-section">
-                    <h3>Badges</h3>
-                    <div class="badges-container">
-                        <div class="badge" data-badge="new">
-                            <i class="fas fa-star"></i>
-                            <span>New</span>
-                        </div>
-                        <div class="badge" data-badge="active">
-                            <i class="fas fa-fire"></i>
-                            <span>Active</span>
-                        </div>
-                        <div class="badge" data-badge="pro">
-                            <i class="fas fa-crown"></i>
-                            <span>Pro</span>
-                        </div>
-                        <div class="badge" data-badge="influencer">
-                            <i class="fas fa-microphone"></i>
-                            <span>Influencer</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bottom Navigation -->
-        <nav class="bottom-nav">
-            <button class="nav-item active" data-screen="home">
-                <i class="fas fa-home"></i>
-                <span>Home</span>
-            </button>
-            <button class="nav-item" data-screen="discover">
-                <i class="fas fa-compass"></i>
-                <span>Discover</span>
-            </button>
-            <button class="nav-item" data-screen="wallet">
-                <i class="fas fa-wallet"></i>
-                <span>Wallet</span>
-            </button>
-            <button class="nav-item" data-screen="earn">
-                <i class="fas fa-coins"></i>
-                <span>Earn</span>
-            </button>
-            <button class="nav-item" data-screen="referral">
-                <i class="fas fa-users"></i>
-                <span>Referral</span>
-            </button>
-            <button class="nav-item" data-screen="profile">
-                <i class="fas fa-user"></i>
-                <span>Profile</span>
-            </button>
-        </nav>
-    </div>
-
-    <!-- Create Post Modal -->
-    <div id="createPostModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Create Post</h3>
-                <button class="close-btn" onclick="closeCreatePost()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <textarea id="postContent" placeholder="What's on your mind?" maxlength="500"></textarea>
-                <div class="post-options">
-                    <button class="option-btn" onclick="attachImage()">
-                        <i class="fas fa-image"></i>
-                        Add Image
-                    </button>
-                    <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
-                    <div class="image-preview" id="imagePreview"></div>
-                </div>
-                <button class="post-btn" onclick="submitPost()">Post</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="spinner"></div>
-        <p>Loading...</p>
-    </div>
-
-    <!-- Notification Toast -->
-    <div id="notification" class="notification">
-        <span id="notificationMessage"></span>
-    </div>
-
+    <title>WinArena - Play, Earn & Win</title>
+    
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     
     <!-- TON Connect SDK -->
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     
-    <!-- Telegram Web App SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Chart.js for Admin Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- Main Script -->
-    <script src="script.js"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0088cc;
+            --secondary-color: #00a8ff;
+            --accent-color: #ff6b6b;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --dark-bg: #1a1a2e;
+            --light-bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #e0e0e0;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body.dark-mode {
+            --primary-color: #00a8ff;
+            --secondary-color: #00d4ff;
+            --card-bg: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #3a3a4e;
+            --light-bg: #1a1a2e;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        .loading-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .loading-subtext {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            padding: 15px 20px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .logo i {
+            font-size: 24px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .header-balance {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--gradient-primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .header-balance i {
+            font-size: 18px;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        /* Screen Sections */
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--primary-color);
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius-sm);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            justify-content: center;
+            min-width: 120px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--gradient-secondary);
+        }
+
+        .btn-success {
+            background: var(--gradient-success);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .btn-lg {
+            padding: 16px 32px;
+            font-size: 18px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.1);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Categories */
+        .categories-container {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            scrollbar-width: none;
+        }
+
+        .categories-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-chip {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .category-chip.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .category-chip:hover {
+            border-color: var(--primary-color);
+        }
+
+        /* Game Cards */
+        .game-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+        }
+
+        .game-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .game-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .game-content {
+            padding: 15px;
+        }
+
+        .game-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .game-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .game-views {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .game-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--warning-color);
+            font-size: 13px;
+        }
+
+        /* Social Feed */
+        .post-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .post-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--gradient-primary);
+        }
+
+        .post-info {
+            flex: 1;
+        }
+
+        .post-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .post-time {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .post-content {
+            margin-bottom: 15px;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .post-image {
+            width: 100%;
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .post-action {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        .post-action:hover {
+            color: var(--primary-color);
+        }
+
+        .post-action.liked {
+            color: var(--danger-color);
+        }
+
+        /* Comments */
+        .comments-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .comment {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .comment-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--gradient-secondary);
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .comment-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .comment-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .comment-text {
+            font-size: 14px;
+            line-height: 1.4;
+            color: var(--text-primary);
+        }
+
+        .comment-input-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .comment-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            font-size: 14px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        /* Wallet Section */
+        .wallet-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .wallet-option {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 20px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .wallet-option:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .wallet-option i {
+            font-size: 30px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .wallet-option-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+
+        .wallet-option-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Deposit Form */
+        .deposit-form {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            font-size: 16px;
+            transition: var(--transition);
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.1);
+        }
+
+        .exchange-info {
+            background: rgba(0, 136, 204, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 12px 15px;
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        /* Transaction History */
+        .transaction-item {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .transaction-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .transaction-icon.deposit {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+        }
+
+        .transaction-icon.withdraw {
+            background: rgba(255, 152, 0, 0.1);
+            color: var(--warning-color);
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-type {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .transaction-amount.positive {
+            color: var(--success-color);
+        }
+
+        .transaction-amount.negative {
+            color: var(--warning-color);
+        }
+
+        /* Tasks Section */
+        .task-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .task-header {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .task-image {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--border-radius-sm);
+            object-fit: cover;
+            background: var(--gradient-primary);
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+
+        .task-category {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .task-reward {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--success-color);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .task-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        /* Referral Section */
+        .referral-code {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 2px dashed var(--primary-color);
+        }
+
+        .referral-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 136, 204, 0.1);
+            padding: 12px 15px;
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-family: monospace;
+        }
+
+        .referral-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Referral List */
+        .referral-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .referral-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--gradient-secondary);
+        }
+
+        .referral-details {
+            flex: 1;
+        }
+
+        .referral-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+            color: var(--text-primary);
+        }
+
+        .referral-status {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .referral-commission {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        /* Leaderboard */
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .leaderboard-rank {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .leaderboard-rank.gold {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333;
+        }
+
+        .leaderboard-rank.silver {
+            background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+            color: #333;
+        }
+
+        .leaderboard-rank.bronze {
+            background: linear-gradient(135deg, #cd7f32, #e6a458);
+            color: white;
+        }
+
+        .leaderboard-info {
+            flex: 1;
+        }
+
+        .leaderboard-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+            color: var(--text-primary);
+        }
+
+        .leaderboard-referrals {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .leaderboard-earnings {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        /* Profile Section */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+
+        .profile-id {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .profile-stat {
+            text-align: center;
+        }
+
+        .profile-stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .profile-stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Settings */
+        .settings-section {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-item:hover {
+            background: rgba(0, 136, 204, 0.05);
+        }
+
+        .settings-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .settings-label i {
+            color: var(--primary-color);
+            width: 20px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: var(--border-color);
+            border-radius: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .toggle-switch.active {
+            background: var(--primary-color);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(24px);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 8px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: var(--border-radius-sm);
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 136, 204, 0.1);
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Daily Check-in Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--danger-color);
+        }
+
+        .checkin-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .checkin-progress {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding: 20px 0;
+        }
+
+        .day-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .day-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-weight: 700;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .day-circle.completed {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .day-circle.current {
+            background: var(--gradient-primary);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .day-circle.pending {
+            background: var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .day-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .checkin-reward {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--success-color);
+            margin-bottom: 20px;
+        }
+
+        /* Skeleton Loaders */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-text {
+            height: 16px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .skeleton-title {
+            height: 20px;
+            width: 60%;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .skeleton-card {
+            height: 200px;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+        }
+
+        /* Empty States */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .empty-description {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            z-index: 2000;
+            display: none;
+            animation: slideDown 0.3s ease;
+            max-width: 90%;
+            text-align: center;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        @keyframes slideDown {
+            from { transform: translate(-50%, -100px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        .toast.success {
+            border-left-color: var(--success-color);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger-color);
+        }
+
+        .toast.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            box-shadow: var(--shadow-lg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: var(--transition);
+            z-index: 90;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 15px;
+            }
+
+            .wallet-options {
+                grid-template-columns: 1fr;
+            }
+
+            .referral-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .game-stats {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .profile-stats {
+                gap: 15px;
+            }
+
+            .checkin-progress {
+                padding: 15px 0;
+            }
+
+            .day-circle {
+                width: 40px;
+                height: 40px;
+                font-size: 12px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .bottom-nav,
+            .fab,
+            .modal,
+            .toast {
+                display: none !important;
+            }
+
+            .main-container {
+                padding-bottom: 0;
+            }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Dark mode specific styles */
+        body.dark-mode .skeleton {
+            background: linear-gradient(90deg, #2a2a3e 25%, #3a3a4e 50%, #2a2a3e 75%);
+            background-size: 200% 100%;
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Welcome to WinArena</div>
+            <div class="loading-subtext">Loading your gaming experience...</div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-gamepad"></i>
+                <span>WinArena</span>
+            </div>
+            <div class="header-balance">
+                <i class="fas fa-coins"></i>
+                <span id="userBalance">0 BTX</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Home Screen -->
+        <div class="screen active" id="homeScreen">
+            <div class="search-container">
+                <input type="text" class="search-input" id="gameSearch" placeholder="Search games...">
+                <button class="search-btn" onclick="searchGames()">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <div class="categories-container" id="categoriesContainer">
+                <div class="category-chip active" onclick="filterByCategory('all')">All Games</div>
+                <div class="category-chip" onclick="filterByCategory('action')">Action</div>
+                <div class="category-chip" onclick="filterByCategory('puzzle')">Puzzle</div>
+                <div class="category-chip" onclick="filterByCategory('strategy')">Strategy</div>
+                <div class="category-chip" onclick="filterByCategory('sports')">Sports</div>
+                <div class="category-chip" onclick="filterByCategory('racing')">Racing</div>
+            </div>
+
+            <div class="sort-options">
+                <select class="form-input" id="sortSelect" onchange="sortGames()">
+                    <option value="new">New Games</option>
+                    <option value="top">Top Rated</option>
+                    <option value="trending">Trending</option>
+                    <option value="popular">Most Popular</option>
+                </select>
+            </div>
+
+            <div id="gamesList">
+                <!-- Games will be loaded here -->
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+            </div>
+        </div>
+
+        <!-- Discover Screen -->
+        <div class="screen" id="discoverScreen">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-edit"></i>
+                    Create Post
+                </div>
+                <textarea class="form-input" id="postContent" placeholder="What's on your mind?" rows="3"></textarea>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn btn-outline btn-sm" onclick="document.getElementById('imageUpload').click()">
+                        <i class="fas fa-image"></i>
+                        Add Image
+                    </button>
+                    <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                </div>
+                <button class="btn" onclick="createPost()">
+                    <i class="fas fa-paper-plane"></i>
+                    Post
+                </button>
+            </div>
+
+            <div id="postsList">
+                <!-- Posts will be loaded here -->
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+            </div>
+        </div>
+
+        <!-- Wallet Screen -->
+        <div class="screen" id="walletScreen">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-wallet"></i>
+                    Your Balance
+                </div>
+                <div style="text-align: center; padding: 20px 0;">
+                    <div style="font-size: 36px; font-weight: 700; color: var(--primary-color);" id="walletBalance">0 BTX</div>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">Available Balance</div>
+                </div>
+            </div>
+
+            <div class="wallet-options">
+                <div class="wallet-option" onclick="showDeposit()">
+                    <i class="fas fa-plus-circle"></i>
+                    <div class="wallet-option-title">Deposit</div>
+                    <div class="wallet-option-desc">Add TON</div>
+                </div>
+                <div class="wallet-option" onclick="showWithdraw()">
+                    <i class="fas fa-minus-circle"></i>
+                    <div class="wallet-option-title">Withdraw</div>
+                    <div class="wallet-option-desc">Get TON</div>
+                </div>
+                <div class="wallet-option" onclick="showHistory()">
+                    <i class="fas fa-history"></i>
+                    <div class="wallet-option-title">History</div>
+                    <div class="wallet-option-desc">View All</div>
+                </div>
+            </div>
+
+            <!-- Deposit Section -->
+            <div id="depositSection" style="display: none;">
+                <div class="deposit-form">
+                    <div class="card-title">
+                        <i class="fas fa-plus-circle"></i>
+                        Deposit TON
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">TON Amount</label>
+                        <input type="number" class="form-input" id="tonAmount" placeholder="Enter TON amount" min="1" step="0.1" oninput="calculateBTX()">
+                    </div>
+                    <div class="exchange-info">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>1 TON = 500 BTX</span>
+                        <div id="exchangeRate" style="margin-top: 5px; font-weight: 600;"></div>
+                    </div>
+                    <button class="btn btn-success btn-lg" onclick="initiateDeposit()" id="depositBtn" disabled>
+                        <i class="fas fa-wallet"></i>
+                        Connect Wallet & Deposit
+                    </button>
+                </div>
+            </div>
+
+            <!-- Withdraw Section -->
+            <div id="withdrawSection" style="display: none;">
+                <div class="deposit-form">
+                    <div class="card-title">
+                        <i class="fas fa-minus-circle"></i>
+                        Withdraw BTX
+                    </div>
+                    <div class="exchange-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Minimum withdrawal: 250 BTX</span>
+                        <div style="margin-top: 5px;">250 BTX = 0.5 TON</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">BTX Amount</label>
+                        <input type="number" class="form-input" id="withdrawAmount" placeholder="Enter BTX amount" min="250" step="50">
+                    </div>
+                    <button class="btn btn-warning btn-lg" onclick="initiateWithdraw()">
+                        <i class="fas fa-paper-plane"></i>
+                        Request Withdrawal
+                    </button>
+                </div>
+            </div>
+
+            <!-- History Section -->
+            <div id="historySection" style="display: none;">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-history"></i>
+                        Transaction History
+                    </div>
+                    <div id="transactionsList">
+                        <!-- Transactions will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TON Wallet Section -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-link"></i>
+                    TON Wallet
+                </div>
+                <div id="walletStatus">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="empty-title">No Wallet Connected</div>
+                        <div class="empty-description">Connect your TON wallet to deposit and withdraw funds</div>
+                        <button class="btn" onclick="connectTonWallet()" style="margin-top: 15px;">
+                            <i class="fas fa-link"></i>
+                            Connect TON Wallet
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Earn Screen -->
+        <div class="screen" id="earnScreen">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-coins"></i>
+                    Watch Ads & Earn
+                </div>
+                <div style="text-align: center; padding: 20px 0;">
+                    <div style="font-size: 24px; font-weight: 700; color: var(--success-color);">0.10 BTX</div>
+                    <div style="color: var(--text-secondary); margin-bottom: 15px;">Per ad watched</div>
+                    <button class="btn btn-success btn-lg" onclick="watchAd()">
+                        <i class="fas fa-play"></i>
+                        Watch Ads
+                    </button>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                    <div style="text-align: center;">
+                        <div style="font-size: 18px; font-weight: 600; color: var(--primary-color);" id="todayWatched">0</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">Today</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 18px; font-weight: 600; color: var(--primary-color);" id="weekWatched">0</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">This Week</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 18px; font-weight: 600; color: var(--primary-color);" id="lifetimeWatched">0</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">Lifetime</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-tasks"></i>
+                    Complete Tasks
+                </div>
+                <div id="tasksList">
+                    <!-- Tasks will be loaded here -->
+                    <div class="skeleton skeleton-card"></div>
+                    <div class="skeleton skeleton-card"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Referral Screen -->
+        <div class="screen" id="referralScreen">
+            <div class="referral-code">
+                <div class="card-title">
+                    <i class="fas fa-share-alt"></i>
+                    Your Referral Link
+                </div>
+                <div class="referral-link">
+                    <input type="text" id="referralLink" readonly style="flex: 1; background: none; border: none; outline: none;">
+                    <button class="btn btn-sm btn-outline" onclick="copyReferralLink()">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                <div style="font-size: 13px; color: var(--text-secondary);">
+                    Share this link and earn 10 BTX + 20% commission
+                </div>
+            </div>
+
+            <div class="referral-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalReferrals">0</div>
+                    <div class="stat-label">Total Referred</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalCommission">0 BTX</div>
+                    <div class="stat-label">Total Commission</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-users"></i>
+                    Your Referrals
+                </div>
+                <div id="referralsList">
+                    <!-- Referrals will be loaded here -->
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="empty-title">No Referrals Yet</div>
+                        <div class="empty-description">Start sharing your referral link to earn rewards!</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-trophy"></i>
+                    Top Referrers (24h)
+                </div>
+                <div id="leaderboardList">
+                    <!-- Leaderboard will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Screen -->
+        <div class="screen" id="profileScreen">
+            <div class="profile-header">
+                <img class="profile-avatar" id="profileAvatar" src="https://via.placeholder.com/80">
+                <div class="profile-info">
+                    <div class="profile-name" id="profileName">Loading...</div>
+                    <div class="profile-id">
+                        <i class="fas fa-hashtag"></i>
+                        <span id="profileUserId">Loading...</span>
+                        <button class="btn btn-sm btn-outline" onclick="copyUserId()">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <div class="profile-stat-value" id="profileLevel">1</div>
+                            <div class="profile-stat-label">Level</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value" id="profileJoined">0</div>
+                            <div class="profile-stat-label">Days</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value" id="profileEarned">0</div>
+                            <div class="profile-stat-label">Earned</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-item" onclick="toggleSound()">
+                    <div class="settings-label">
+                        <i class="fas fa-volume-up"></i>
+                        Sound Effects
+                    </div>
+                    <div class="toggle-switch active" id="soundToggle">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+                <div class="settings-item" onclick="toggleNotifications()">
+                    <div class="settings-label">
+                        <i class="fas fa-bell"></i>
+                        Notifications
+                    </div>
+                    <div class="toggle-switch active" id="notificationToggle">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+                <div class="settings-item" onclick="toggleTheme()">
+                    <div class="settings-label">
+                        <i class="fas fa-moon"></i>
+                        Dark Mode
+                    </div>
+                    <div class="toggle-switch" id="themeToggle">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-item" onclick="viewTonWallet()">
+                    <div class="settings-label">
+                        <i class="fas fa-wallet"></i>
+                        TON Wallet
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
+                </div>
+                <div class="settings-item" onclick="disconnectTonWallet()">
+                    <div class="settings-label">
+                        <i class="fas fa-unlink"></i>
+                        Disconnect Wallet
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
+                </div>
+                <div class="settings-item" onclick="showAccountSettings()">
+                    <div class="settings-label">
+                        <i class="fas fa-cog"></i>
+                        Account Settings
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
+                </div>
+                <div class="settings-item" onclick="deleteAccount()">
+                    <div class="settings-label">
+                        <i class="fas fa-trash"></i>
+                        Delete Account
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--danger-color);"></i>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-info-circle"></i>
+                    App Information
+                </div>
+                <div style="font-size: 14px; line-height: 1.6; color: var(--text-secondary);">
+                    <div style="margin-bottom: 10px;"><strong>Version:</strong> 2.0.0</div>
+                    <div style="margin-bottom: 10px;"><strong>Developer:</strong> WinArena Team</div>
+                    <div style="margin-bottom: 10px;"><strong>Website:</strong> winarena.vercel.app</div>
+                    <div><strong>Support:</strong> @WinArenaGame_bot</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-container">
+            <div class="nav-item active" onclick="switchScreen('home')">
+                <i class="fas fa-home nav-icon"></i>
+                <span class="nav-label">Home</span>
+            </div>
+            <div class="nav-item" onclick="switchScreen('discover')">
+                <i class="fas fa-compass nav-icon"></i>
+                <span class="nav-label">Discover</span>
+            </div>
+            <div class="nav-item" onclick="switchScreen('wallet')">
+                <i class="fas fa-wallet nav-icon"></i>
+                <span class="nav-label">Wallet</span>
+            </div>
+            <div class="nav-item" onclick="switchScreen('earn')">
+                <i class="fas fa-coins nav-icon"></i>
+                <span class="nav-label">Earn</span>
+            </div>
+            <div class="nav-item" onclick="switchScreen('referral')">
+                <i class="fas fa-share-alt nav-icon"></i>
+                <span class="nav-label">Referral</span>
+            </div>
+            <div class="nav-item" onclick="switchScreen('profile')">
+                <i class="fas fa-user nav-icon"></i>
+                <span class="nav-label">Profile</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Daily Check-in Modal -->
+    <div class="modal" id="checkinModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeCheckinModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="checkin-title">
+                <i class="fas fa-calendar-check" style="color: var(--success-color);"></i>
+                Daily Check-in
+            </div>
+            <div class="checkin-progress" id="checkinProgress">
+                <!-- Progress days will be loaded here -->
+            </div>
+            <div class="checkin-reward" id="checkinReward">
+                <!-- Reward will be shown here -->
+            </div>
+            <button class="btn btn-success btn-lg" onclick="claimCheckinReward()" id="claimCheckinBtn">
+                <i class="fas fa-gift"></i>
+                Claim Reward
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Floating Action Button -->
+    <button class="fab" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyYOUR_API_KEY_HERE",
+            authDomain: "winarena-app.firebaseapp.com",
+            databaseURL: "https://winarena-app-default-rtdb.firebaseio.com",
+            projectId: "winarena-app",
+            storageBucket: "winarena-app.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef123456789012345"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const storage = firebase.storage();
+
+        // Global Variables
+        let telegram = window.Telegram.WebApp;
+        let currentUser = null;
+        let tonConnectUI = null;
+        let currentScreen = 'home';
+        let userSettings = {
+            sound: true,
+            notifications: true,
+            darkMode: false
+        };
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            // Initialize Telegram WebApp
+            telegram.ready();
+            telegram.expand();
+            
+            // Get user data from Telegram
+            currentUser = telegram.initDataUnsafe?.user;
+            
+            if (currentUser) {
+                initializeUser();
+            } else {
+                showToast('Please open this app from Telegram', 'error');
+                setTimeout(() => {
+                    telegram.close();
+                }, 3000);
+                return;
+            }
+
+            // Initialize TON Connect
+            initializeTonConnect();
+
+            // Check for daily check-in
+            checkDailyCheckin();
+
+            // Load initial data
+            loadGames();
+            loadPosts();
+            loadTasks();
+            loadReferrals();
+            loadTransactions();
+            updateStats();
+
+            // Hide loading screen
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loadingScreen').style.display = 'none';
+                }, 500);
+            }, 1500);
+        }
+
+        function initializeUser() {
+            const userId = currentUser.id;
+            const userRef = database.ref('users/' + userId);
+
+            userRef.once('value').then((snapshot) => {
+                if (!snapshot.exists()) {
+                    // Create new user
+                    const newUser = {
+                        id: userId,
+                        name: currentUser.first_name + ' ' + (currentUser.last_name || ''),
+                        username: currentUser.username || '',
+                        photo_url: currentUser.photo_url || '',
+                        balance: 0,
+                        level: 1,
+                        joined: new Date().toISOString(),
+                        lastCheckin: null,
+                        checkinStreak: 0,
+                        totalEarned: 0,
+                        referrals: [],
+                        walletConnected: false,
+                        walletAddress: null,
+                        settings: userSettings,
+                        statistics: {
+                            gamesPlayed: 0,
+                            adsWatched: 0,
+                            tasksCompleted: 0,
+                            postsCreated: 0,
+                            referralsCount: 0,
+                            todayWatched: 0,
+                            weekWatched: 0,
+                            lifetimeWatched: 0
+                        }
+                    };
+
+                    userRef.set(newUser).then(() => {
+                        currentUser = newUser;
+                        updateUserInterface();
+                        handleReferral();
+                    });
+                } else {
+                    currentUser = snapshot.val();
+                    updateUserInterface();
+                    handleReferral();
+                }
+            });
+        }
+
+        function handleReferral() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const referrerId = urlParams.get('start');
+            
+            if (referrerId && referrerId !== currentUser.id.toString()) {
+                const referrerRef = database.ref('users/' + referrerId);
+                
+                referrerRef.once('value').then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const referrer = snapshot.val();
+                        
+                        // Add referral to referrer's list
+                        if (!referrer.referrals.includes(currentUser.id)) {
+                            referrer.referrals.push(currentUser.id);
+                            referrerRef.child('referrals').set(referrer.referrals);
+                            
+                            // Give referrer bonus
+                            database.ref('users/' + referrerId).child('balance').set(
+                                firebase.database.ServerValue.increment(10)
+                            );
+                            
+                            // Give referred user bonus
+                            database.ref('users/' + currentUser.id).child('balance').set(
+                                firebase.database.ServerValue.increment(10)
+                            );
+                            
+                            // Log referral
+                            database.ref('referrals').push({
+                                referrerId: referrerId,
+                                referredId: currentUser.id,
+                                timestamp: new Date().toISOString(),
+                                reward: 10
+                            });
+                            
+                            showToast('Welcome! You received 10 BTX for joining!', 'success');
+                        }
+                    }
+                });
+            }
+        }
+
+        function updateUserInterface() {
+            // Update profile info
+            document.getElementById('profileName').textContent = currentUser.name || 'Unknown';
+            document.getElementById('profileUserId').textContent = currentUser.id;
+            
+            if (currentUser.photo_url) {
+                document.getElementById('profileAvatar').src = currentUser.photo_url;
+            }
+            
+            // Update balance
+            document.getElementById('userBalance').textContent = currentUser.balance + ' BTX';
+            document.getElementById('walletBalance').textContent = currentUser.balance + ' BTX';
+            
+            // Update stats
+            document.getElementById('profileLevel').textContent = currentUser.level || 1;
+            
+            const joinedDate = new Date(currentUser.joined);
+            const daysSinceJoined = Math.floor((new Date() - joinedDate) / (1000 * 60 * 60 * 24));
+            document.getElementById('profileJoined').textContent = daysSinceJoined;
+            
+            document.getElementById('profileEarned').textContent = currentUser.totalEarned || 0;
+            
+            // Update settings
+            if (currentUser.settings) {
+                userSettings = currentUser.settings;
+                document.getElementById('soundToggle').classList.toggle('active', userSettings.sound);
+                document.getElementById('notificationToggle').classList.toggle('active', userSettings.notifications);
+                document.getElementById('themeToggle').classList.toggle('active', userSettings.darkMode);
+                
+                if (userSettings.darkMode) {
+                    document.body.classList.add('dark-mode');
+                }
+            }
+            
+            // Update statistics
+            if (currentUser.statistics) {
+                document.getElementById('todayWatched').textContent = currentUser.statistics.todayWatched || 0;
+                document.getElementById('weekWatched').textContent = currentUser.statistics.weekWatched || 0;
+                document.getElementById('lifetimeWatched').textContent = currentUser.statistics.lifetimeWatched || 0;
+            }
+            
+            // Update referral info
+            const referralLink = `https://t.me/WinArenaGame_bot/open?start=${currentUser.id}`;
+            document.getElementById('referralLink').value = referralLink;
+            
+            // Update wallet status
+            updateWalletStatus();
+        }
+
+        function initializeTonConnect() {
+            try {
+                tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+                    manifestUrl: 'https://winarena.vercel.app/tonconnect-manifest.json',
+                    buttonRootId: null
+                });
+
+                tonConnectUI.onStatusChange(wallet => {
+                    if (wallet) {
+                        handleTonWalletConnected(wallet);
+                    } else {
+                        handleTonWalletDisconnected();
+                    }
+                });
+            } catch (error) {
+                console.error('Failed to initialize TON Connect:', error);
+            }
+        }
+
+        function connectTonWallet() {
+            if (tonConnectUI) {
+                tonConnectUI.connectWallet();
+            } else {
+                showToast('TON Connect not available', 'error');
+            }
+        }
+
+        function disconnectTonWallet() {
+            if (tonConnectUI && tonConnectUI.wallet) {
+                tonConnectUI.disconnect();
+            } else {
+                showToast('No wallet connected', 'warning');
+            }
+        }
+
+        function handleTonWalletConnected(wallet) {
+            const walletAddress = wallet.account.address;
+            
+            // Save wallet info to Firebase
+            database.ref('users/' + currentUser.id).update({
+                walletConnected: true,
+                walletAddress: walletAddress,
+                lastWalletConnect: new Date().toISOString()
+            });
+
+            currentUser.walletConnected = true;
+            currentUser.walletAddress = walletAddress;
+            
+            updateWalletStatus();
+            showToast('TON Wallet connected successfully!', 'success');
+        }
+
+        function handleTonWalletDisconnected() {
+            // Remove wallet info from Firebase
+            database.ref('users/' + currentUser.id).update({
+                walletConnected: false,
+                walletAddress: null
+            });
+
+            currentUser.walletConnected = false;
+            currentUser.walletAddress = null;
+            
+            updateWalletStatus();
+            showToast('TON Wallet disconnected', 'info');
+        }
+
+        function updateWalletStatus() {
+            const walletStatus = document.getElementById('walletStatus');
+            
+            if (currentUser.walletConnected && currentUser.walletAddress) {
+                const shortAddress = currentUser.walletAddress.slice(0, 6) + '...' + currentUser.walletAddress.slice(-4);
+                
+                walletStatus.innerHTML = `
+                    <div style="text-align: center; padding: 20px 0;">
+                        <div style="color: var(--success-color); margin-bottom: 10px;">
+                            <i class="fas fa-check-circle" style="font-size: 24px;"></i>
+                        </div>
+                        <div style="font-weight: 600; margin-bottom: 5px;">Wallet Connected</div>
+                        <div style="font-size: 14px; color: var(--text-secondary); font-family: monospace; margin-bottom: 15px;">
+                            ${shortAddress}
+                        </div>
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <button class="btn btn-sm btn-outline" onclick="copyWalletAddress()">
+                                <i class="fas fa-copy"></i>
+                                Copy
+                            </button>
+                            <button class="btn btn-sm btn-outline" onclick="disconnectTonWallet()">
+                                <i class="fas fa-unlink"></i>
+                                Disconnect
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                walletStatus.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="empty-title">No Wallet Connected</div>
+                        <div class="empty-description">Connect your TON wallet to deposit and withdraw funds</div>
+                        <button class="btn" onclick="connectTonWallet()" style="margin-top: 15px;">
+                            <i class="fas fa-link"></i>
+                            Connect TON Wallet
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function copyWalletAddress() {
+            if (currentUser.walletAddress) {
+                navigator.clipboard.writeText(currentUser.walletAddress).then(() => {
+                    showToast('Wallet address copied to clipboard!', 'success');
+                });
+            }
+        }
+
+        function switchScreen(screenName) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show selected screen
+            document.getElementById(screenName + 'Screen').classList.add('active');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            currentScreen = screenName;
+            
+            // Load screen-specific data
+            switch(screenName) {
+                case 'home':
+                    loadGames();
+                    break;
+                case 'discover':
+                    loadPosts();
+                    break;
+                case 'wallet':
+                    loadTransactions();
+                    break;
+                case 'earn':
+                    loadTasks();
+                    break;
+                case 'referral':
+                    loadReferrals();
+                    loadLeaderboard();
+                    break;
+                case 'profile':
+                    updateStats();
+                    break;
+            }
+        }
+
+        function loadGames() {
+            const gamesList = document.getElementById('gamesList');
+            gamesList.innerHTML = '';
+            
+            // Show skeleton loaders
+            for (let i = 0; i < 3; i++) {
+                gamesList.innerHTML += '<div class="skeleton skeleton-card"></div>';
+            }
+            
+            // Load games from Firebase
+            database.ref('games').orderByChild('active').equalTo(true).once('value').then((snapshot) => {
+                const games = snapshot.val();
+                gamesList.innerHTML = '';
+                
+                if (games) {
+                    Object.keys(games).forEach(gameId => {
+                        const game = games[gameId];
+                        const gameCard = createGameCard(game, gameId);
+                        gamesList.appendChild(gameCard);
+                    });
+                } else {
+                    gamesList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                            <div class="empty-title">No Games Available</div>
+                            <div class="empty-description">Games will be added soon by the admin</div>
+                        </div>
+                    `;
+                }
+            }).catch((error) => {
+                console.error('Error loading games:', error);
+                showToast('Failed to load games', 'error');
+                gamesList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="empty-title">Error Loading Games</div>
+                        <div class="empty-description">Please try again later</div>
+                    </div>
+                `;
+            });
+        }
+
+        function createGameCard(game, gameId) {
+            const card = document.createElement('div');
+            card.className = 'game-card';
+            card.onclick = () => playGame(gameId, game);
+            
+            card.innerHTML = `
+                <img class="game-image" src="${game.image || 'https://via.placeholder.com/300x150/667eea/764ba2?text=Game'}" alt="${game.title}">
+                <div class="game-content">
+                    <div class="game-title">${game.title}</div>
+                    <div class="game-description">${game.description}</div>
+                    <div class="game-stats">
+                        <div class="game-views">
+                            <i class="fas fa-eye"></i>
+                            <span>${game.views || 0}</span>
+                        </div>
+                        <div class="game-rating">
+                            <i class="fas fa-star"></i>
+                            <span>${game.rating || 0}</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-sm" onclick="event.stopPropagation(); playGame('${gameId}', ${JSON.stringify(game).replace(/"/g, '&quot;')})">
+                        <i class="fas fa-play"></i>
+                        Play Now
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function playGame(gameId, game) {
+            // Increment view count
+            database.ref('games/' + gameId + '/views').set(
+                firebase.database.ServerValue.increment(1)
+            );
+            
+            // Update user statistics
+            database.ref('users/' + currentUser.id + '/statistics/gamesPlayed').set(
+                firebase.database.ServerValue.increment(1)
+            );
+            
+            // Open game link in Telegram
+            if (game.url) {
+                telegram.openLink(game.url);
+            } else {
+                showToast('Game not available', 'warning');
+            }
+        }
+
+        function searchGames() {
+            const searchTerm = document.getElementById('gameSearch').value.toLowerCase();
+            const gameCards = document.querySelectorAll('.game-card');
+            
+            gameCards.forEach(card => {
+                const title = card.querySelector('.game-title').textContent.toLowerCase();
+                const description = card.querySelector('.game-description').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function filterByCategory(category) {
+            // Update active category
+            document.querySelectorAll('.category-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Filter games
+            const gameCards = document.querySelectorAll('.game-card');
+            
+            if (category === 'all') {
+                gameCards.forEach(card => {
+                    card.style.display = 'block';
+                });
+            } else {
+                // This would require category data in the game objects
+                // For now, just show all games
+                gameCards.forEach(card => {
+                    card.style.display = 'block';
+                });
+            }
+        }
+
+        function sortGames() {
+            const sortBy = document.getElementById('sortSelect').value;
+            const gamesList = document.getElementById('gamesList');
+            const gameCards = Array.from(gamesList.querySelectorAll('.game-card'));
+            
+            gameCards.sort((a, b) => {
+                // Sorting logic would need to be implemented based on the sort type
+                return 0;
+            });
+            
+            gamesList.innerHTML = '';
+            gameCards.forEach(card => {
+                gamesList.appendChild(card);
+            });
+        }
+
+        function loadPosts() {
+            const postsList = document.getElementById('postsList');
+            postsList.innerHTML = '';
+            
+            // Show skeleton loaders
+            for (let i = 0; i < 3; i++) {
+                postsList.innerHTML += '<div class="skeleton skeleton-card"></div>';
+            }
+            
+            // Load posts from Firebase
+            database.ref('posts').orderByChild('timestamp').limitToLast(50).once('value').then((snapshot) => {
+                const posts = snapshot.val();
+                postsList.innerHTML = '';
+                
+                if (posts) {
+                    // Convert to array and sort by timestamp
+                    const postsArray = Object.keys(posts).map(postId => ({
+                        id: postId,
+                        ...posts[postId]
+                    })).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    
+                    postsArray.forEach(post => {
+                        const postCard = createPostCard(post);
+                        postsList.appendChild(postCard);
+                    });
+                } else {
+                    postsList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="empty-title">No Posts Yet</div>
+                            <div class="empty-description">Be the first to share something!</div>
+                        </div>
+                    `;
+                }
+            }).catch((error) => {
+                console.error('Error loading posts:', error);
+                showToast('Failed to load posts', 'error');
+            });
+        }
+
+        function createPostCard(post) {
+            const card = document.createElement('div');
+            card.className = 'post-card';
+            
+            const timeAgo = getTimeAgo(new Date(post.timestamp));
+            const isLiked = post.likes && post.likes.includes(currentUser.id);
+            
+            card.innerHTML = `
+                <div class="post-header">
+                    <img class="post-avatar" src="${post.authorPhoto || 'https://via.placeholder.com/45'}" alt="${post.authorName}">
+                    <div class="post-info">
+                        <div class="post-name">${post.authorName}</div>
+                        <div class="post-time">${timeAgo}</div>
+                    </div>
+                </div>
+                <div class="post-content">${post.content}</div>
+                ${post.image ? `<img class="post-image" src="${post.image}" alt="Post image" onclick="viewImage('${post.image}')">` : ''}
+                <div class="post-actions">
+                    <div class="post-action ${isLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
+                        <i class="fas fa-heart"></i>
+                        <span>${post.likes ? post.likes.length : 0}</span>
+                    </div>
+                    <div class="post-action" onclick="toggleComments('${post.id}')">
+                        <i class="fas fa-comment"></i>
+                        <span>${post.comments ? Object.keys(post.comments).length : 0}</span>
+                    </div>
+                    <div class="post-action" onclick="sharePost('${post.id}')">
+                        <i class="fas fa-share"></i>
+                        <span>Share</span>
+                    </div>
+                </div>
+                <div class="comments-section" id="comments-${post.id}" style="display: none;">
+                    <div class="comment-input-container">
+                        <input type="text" class="comment-input" id="comment-input-${post.id}" placeholder="Add a comment...">
+                        <button class="btn btn-sm" onclick="addComment('${post.id}')">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div id="comments-list-${post.id}">
+                        <!-- Comments will be loaded here -->
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function createPost() {
+            const content = document.getElementById('postContent').value.trim();
+            
+            if (!content) {
+                showToast('Please enter some content', 'warning');
+                return;
+            }
+            
+            // Check for external links
+            const linkRegex = /(https?:\/\/[^\s]+)/g;
+            if (linkRegex.test(content)) {
+                showToast('External links are not allowed', 'error');
+                return;
+            }
+            
+            const postData = {
+                authorId: currentUser.id,
+                authorName: currentUser.name,
+                authorPhoto: currentUser.photo_url,
+                content: content,
+                timestamp: new Date().toISOString(),
+                likes: [],
+                comments: {},
+                shares: 0
+            };
+            
+            database.ref('posts').push(postData).then(() => {
+                document.getElementById('postContent').value = '';
+                showToast('Post created successfully!', 'success');
+                
+                // Update user statistics
+                database.ref('users/' + currentUser.id + '/statistics/postsCreated').set(
+                    firebase.database.ServerValue.increment(1)
+                );
+                
+                // Reload posts
+                loadPosts();
+            }).catch((error) => {
+                console.error('Error creating post:', error);
+                showToast('Failed to create post', 'error');
+            });
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            
+            if (file && file.type.startsWith('image/')) {
+                // Compress image before upload
+                compressImage(file).then(compressedFile => {
+                    const storageRef = storage.ref('post-images/' + currentUser.id + '/' + Date.now());
+                    
+                    storageRef.put(compressedFile).then((snapshot) => {
+                        return snapshot.ref.getDownloadURL();
+                    }).then((downloadURL) => {
+                        // Store the image URL temporarily
+                        window.tempPostImage = downloadURL;
+                        showToast('Image uploaded successfully!', 'success');
+                    }).catch((error) => {
+                        console.error('Error uploading image:', error);
+                        showToast('Failed to upload image', 'error');
+                    });
+                });
+            }
+        }
+
+        function compressImage(file) {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                img.onload = function() {
+                    const maxWidth = 800;
+                    const maxHeight = 600;
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width *= maxHeight / height;
+                            height = maxHeight;
+                        }
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    canvas.toBlob(resolve, 'image/jpeg', 0.8);
+                };
+                
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        function toggleLike(postId) {
+            const postRef = database.ref('posts/' + postId + '/likes');
+            
+            postRef.once('value').then((snapshot) => {
+                const likes = snapshot.val() || [];
+                const userIndex = likes.indexOf(currentUser.id);
+                
+                if (userIndex > -1) {
+                    // Remove like
+                    likes.splice(userIndex, 1);
+                } else {
+                    // Add like
+                    likes.push(currentUser.id);
+                }
+                
+                postRef.set(likes);
+            });
+        }
+
+        function toggleComments(postId) {
+            const commentsSection = document.getElementById('comments-' + postId);
+            const isVisible = commentsSection.style.display !== 'none';
+            
+            // Hide all comment sections
+            document.querySelectorAll('.comments-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show current comment section if it was hidden
+            if (!isVisible) {
+                commentsSection.style.display = 'block';
+                loadComments(postId);
+            }
+        }
+
+        function loadComments(postId) {
+            const commentsList = document.getElementById('comments-list-' + postId);
+            
+            database.ref('posts/' + postId + '/comments').once('value').then((snapshot) => {
+                const comments = snapshot.val();
+                commentsList.innerHTML = '';
+                
+                if (comments) {
+                    Object.keys(comments).forEach(commentId => {
+                        const comment = comments[commentId];
+                        const commentElement = createCommentElement(comment, commentId);
+                        commentsList.appendChild(commentElement);
+                    });
+                }
+            });
+        }
+
+        function createCommentElement(comment, commentId) {
+            const div = document.createElement('div');
+            div.className = 'comment';
+            
+            div.innerHTML = `
+                <img class="comment-avatar" src="${comment.authorPhoto || 'https://via.placeholder.com/35'}" alt="${comment.authorName}">
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <div class="comment-name">${comment.authorName}</div>
+                        <div class="comment-time">${getTimeAgo(new Date(comment.timestamp))}</div>
+                    </div>
+                    <div class="comment-text">${comment.content}</div>
+                </div>
+            `;
+            
+            return div;
+        }
+
+        function addComment(postId) {
+            const input = document.getElementById('comment-input-' + postId);
+            const content = input.value.trim();
+            
+            if (!content) {
+                showToast('Please enter a comment', 'warning');
+                return;
+            }
+            
+            const commentData = {
+                authorId: currentUser.id,
+                authorName: currentUser.name,
+                authorPhoto: currentUser.photo_url,
+                content: content,
+                timestamp: new Date().toISOString()
+            };
+            
+            database.ref('posts/' + postId + '/comments').push(commentData).then(() => {
+                input.value = '';
+                loadComments(postId);
+                showToast('Comment added!', 'success');
+            }).catch((error) => {
+                console.error('Error adding comment:', error);
+                showToast('Failed to add comment', 'error');
+            });
+        }
+
+        function sharePost(postId) {
+            const shareUrl = `https://t.me/WinArenaGame_bot/open?start=${currentUser.id}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Check out this post on WinArena',
+                    text: 'Join me on WinArena!',
+                    url: shareUrl
+                });
+            } else {
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    showToast('Share link copied to clipboard!', 'success');
+                });
+            }
+        }
+
+        function viewImage(imageUrl) {
+            // Open image in Telegram's image viewer
+            telegram.openTelegramLink(imageUrl);
+        }
+
+        function showDeposit() {
+            document.getElementById('depositSection').style.display = 'block';
+            document.getElementById('withdrawSection').style.display = 'none';
+            document.getElementById('historySection').style.display = 'none';
+        }
+
+        function showWithdraw() {
+            document.getElementById('depositSection').style.display = 'none';
+            document.getElementById('withdrawSection').style.display = 'block';
+            document.getElementById('historySection').style.display = 'none';
+        }
+
+        function showHistory() {
+            document.getElementById('depositSection').style.display = 'none';
+            document.getElementById('withdrawSection').style.display = 'none';
+            document.getElementById('historySection').style.display = 'block';
+            loadTransactions();
+        }
+
+        function calculateBTX() {
+            const tonAmount = parseFloat(document.getElementById('tonAmount').value) || 0;
+            const btxAmount = tonAmount * 500;
+            
+            if (tonAmount > 0) {
+                document.getElementById('exchangeRate').textContent = `You will receive ${btxAmount} BTX`;
+                document.getElementById('depositBtn').disabled = false;
+            } else {
+                document.getElementById('exchangeRate').textContent = '';
+                document.getElementById('depositBtn').disabled = true;
+            }
+        }
+
+        function initiateDeposit() {
+            if (!currentUser.walletConnected) {
+                showToast('Please connect your TON wallet first', 'warning');
+                connectTonWallet();
+                return;
+            }
+            
+            const tonAmount = parseFloat(document.getElementById('tonAmount').value);
+            
+            if (tonAmount < 1) {
+                showToast('Minimum deposit is 1 TON', 'warning');
+                return;
+            }
+            
+            const btxAmount = tonAmount * 500;
+            
+            // Create deposit record
+            const depositData = {
+                userId: currentUser.id,
+                tonAmount: tonAmount,
+                btxAmount: btxAmount,
+                walletAddress: currentUser.walletAddress,
+                timestamp: new Date().toISOString(),
+                status: 'pending',
+                type: 'deposit'
+            };
+            
+            database.ref('transactions').push(depositData).then((snapshot) => {
+                const transactionId = snapshot.key;
+                
+                // Update UI to show payment info
+                document.getElementById('depositSection').innerHTML = `
+                    <div class="card-title">
+                        <i class="fas fa-clock"></i>
+                        Deposit Pending
+                    </div>
+                    <div style="text-align: center; padding: 20px 0;">
+                        <div style="font-size: 48px; color: var(--warning-color); margin-bottom: 15px;">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">
+                            Send ${tonAmount} TON to this address:
+                        </div>
+                        <div style="background: rgba(0, 136, 204, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px; font-family: monospace; word-break: break-all;">
+                            UQACiEaN0Qt2TjpxBdJ7XZateCvEPjdA7qf5bMo5uCPLbSoh
+                        </div>
+                        <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px;">
+                            Transaction ID: ${transactionId}
+                        </div>
+                        <button class="btn btn-outline" onclick="copyDepositAddress()">
+                            <i class="fas fa-copy"></i>
+                            Copy Address
+                        </button>
+                    </div>
+                `;
+                
+                showToast('Please send TON to complete the deposit', 'info');
+                
+                // Send notification to bot
+                sendBotNotification(`New deposit request: ${tonAmount} TON from ${currentUser.name} (${currentUser.id})`);
+                
+                // Set up listener for transaction confirmation
+                setupDepositListener(transactionId, btxAmount);
+                
+            }).catch((error) => {
+                console.error('Error creating deposit:', error);
+                showToast('Failed to create deposit', 'error');
+            });
+        }
+
+        function setupDepositListener(transactionId, btxAmount) {
+            const transactionRef = database.ref('transactions/' + transactionId);
+            
+            // In a real implementation, you would set up a webhook or monitor the blockchain
+            // For this demo, we'll simulate confirmation after 30 seconds
+            setTimeout(() => {
+                transactionRef.update({
+                    status: 'confirmed',
+                    confirmedAt: new Date().toISOString()
+                }).then(() => {
+                    // Credit user's balance
+                    database.ref('users/' + currentUser.id + '/balance').set(
+                        firebase.database.ServerValue.increment(btxAmount)
+                    );
+                    
+                    // Update statistics
+                    database.ref('users/' + currentUser.id + '/totalEarned').set(
+                        firebase.database.ServerValue.increment(btxAmount)
+                    );
+                    
+                    showToast('Deposit confirmed! ' + btxAmount + ' BTX added to your balance', 'success');
+                    
+                    // Send bot notification
+                    sendBotNotification(`Deposit confirmed: ${btxAmount} BTX credited to ${currentUser.name} (${currentUser.id})`);
+                    
+                    // Update UI
+                    loadTransactions();
+                    updateUserInterface();
+                });
+            }, 30000); // 30 seconds for demo
+        }
+
+        function copyDepositAddress() {
+            const address = 'UQACiEaN0Qt2TjpxBdJ7XZateCvEPjdA7qf5bMo5uCPLbSoh';
+            navigator.clipboard.writeText(address).then(() => {
+                showToast('Deposit address copied to clipboard!', 'success');
+            });
+        }
+
+        function initiateWithdraw() {
+            const btxAmount = parseFloat(document.getElementById('withdrawAmount').value);
+            
+            if (btxAmount < 250) {
+                showToast('Minimum withdrawal is 250 BTX', 'warning');
+                return;
+            }
+            
+            if (btxAmount > currentUser.balance) {
+                showToast('Insufficient balance', 'warning');
+                return;
+            }
+            
+            if (!currentUser.walletConnected) {
+                showToast('Please connect your TON wallet first', 'warning');
+                connectTonWallet();
+                return;
+            }
+            
+            const tonAmount = btxAmount / 500;
+            
+            // Create withdraw record
+            const withdrawData = {
+                userId: currentUser.id,
+                tonAmount: tonAmount,
+                btxAmount: btxAmount,
+                walletAddress: currentUser.walletAddress,
+                timestamp: new Date().toISOString(),
+                status: 'pending',
+                type: 'withdraw'
+            };
+            
+            database.ref('transactions').push(withdrawData).then((snapshot) => {
+                const transactionId = snapshot.key;
+                
+                // Deduct from user balance immediately
+                database.ref('users/' + currentUser.id + '/balance').set(
+                    firebase.database.ServerValue.increment(-btxAmount)
+                );
+                
+                showToast('Withdrawal request submitted! Awaiting admin approval', 'info');
+                
+                // Send notification to bot
+                sendBotNotification(`New withdrawal request: ${btxAmount} BTX (${tonAmount} TON) from ${currentUser.name} (${currentUser.id})`);
+                
+                // Update UI
+                loadTransactions();
+                updateUserInterface();
+                
+                // Reset form
+                document.getElementById('withdrawAmount').value = '';
+                
+            }).catch((error) => {
+                console.error('Error creating withdrawal:', error);
+                showToast('Failed to create withdrawal request', 'error');
+            });
+        }
+
+        function loadTransactions() {
+            const transactionsList = document.getElementById('transactionsList');
+            
+            if (!transactionsList) return;
+            
+            transactionsList.innerHTML = '<div style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i></div>';
+            
+            database.ref('transactions').orderByChild('userId').equalTo(currentUser.id).once('value').then((snapshot) => {
+                const transactions = snapshot.val();
+                transactionsList.innerHTML = '';
+                
+                if (transactions) {
+                    const transactionsArray = Object.keys(transactions).map(id => ({
+                        id: id,
+                        ...transactions[id]
+                    })).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    
+                    transactionsArray.forEach(transaction => {
+                        const transactionElement = createTransactionElement(transaction);
+                        transactionsList.appendChild(transactionElement);
+                    });
+                } else {
+                    transactionsList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <div class="empty-title">No Transactions</div>
+                            <div class="empty-description">Your transaction history will appear here</div>
+                        </div>
+                    `;
+                }
+            }).catch((error) => {
+                console.error('Error loading transactions:', error);
+                transactionsList.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--danger-color);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>Failed to load transactions</div>
+                    </div>
+                `;
+            });
+        }
+
+        function createTransactionElement(transaction) {
+            const div = document.createElement('div');
+            div.className = 'transaction-item';
+            
+            const isDeposit = transaction.type === 'deposit';
+            const statusColor = transaction.status === 'confirmed' ? 'var(--success-color)' : 
+                              transaction.status === 'pending' ? 'var(--warning-color)' : 
+                              'var(--danger-color)';
+            
+            div.innerHTML = `
+                <div class="transaction-info">
+                    <div class="transaction-icon ${isDeposit ? 'deposit' : 'withdraw'}">
+                        <i class="fas fa-${isDeposit ? 'arrow-down' : 'arrow-up'}"></i>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="transaction-type">${isDeposit ? 'Deposit' : 'Withdrawal'}</div>
+                        <div class="transaction-date">${new Date(transaction.timestamp).toLocaleDateString()}</div>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="transaction-amount ${isDeposit ? 'positive' : 'negative'}">
+                        ${isDeposit ? '+' : '-'}${transaction.btxAmount} BTX
+                    </div>
+                    <div style="font-size: 12px; color: ${statusColor};">
+                        ${transaction.status}
+                    </div>
+                </div>
+            `;
+            
+            return div;
+        }
+
+        function loadTasks() {
+            const tasksList = document.getElementById('tasksList');
+            
+            database.ref('tasks').orderByChild('active').equalTo(true).once('value').then((snapshot) => {
+                const tasks = snapshot.val();
+                tasksList.innerHTML = '';
+                
+                if (tasks) {
+                    Object.keys(tasks).forEach(taskId => {
+                        const task = tasks[taskId];
+                        const taskCard = createTaskCard(task, taskId);
+                        tasksList.appendChild(taskCard);
+                    });
+                } else {
+                    tasksList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <div class="empty-title">No Tasks Available</div>
+                            <div class="empty-description">Tasks will be added soon by the admin</div>
+                        </div>
+                    `;
+                }
+            }).catch((error) => {
+                console.error('Error loading tasks:', error);
+            });
+        }
+
+        function createTaskCard(task, taskId) {
+            const div = document.createElement('div');
+            div.className = 'task-card';
+            
+            // Check if user has completed this task
+            const isCompleted = currentUser.completedTasks && currentUser.completedTasks.includes(taskId);
+            
+            div.innerHTML = `
+                <div class="task-header">
+                    <img class="task-image" src="${task.image || 'https://via.placeholder.com/60'}" alt="${task.title}">
+                    <div class="task-info">
+                        <div class="task-title">${task.title}</div>
+                        <span class="task-category">${task.category}</span>
+                    </div>
+                </div>
+                <div class="task-reward">
+                    <i class="fas fa-coins"></i>
+                    ${task.reward} BTX Reward
+                </div>
+                <div class="task-description">${task.description}</div>
+                <button class="btn ${isCompleted ? 'btn-outline' : 'btn-success'}" 
+                        onclick="startTask('${taskId}', '${task.link}', ${task.reward})"
+                        ${isCompleted ? 'disabled' : ''}>
+                    <i class="fas fa-${isCompleted ? 'check' : 'external-link-alt'}"></i>
+                    ${isCompleted ? 'Completed' : 'Start Task'}
+                </button>
+            `;
+            
+            return div;
+        }
+
+        function startTask(taskId, taskLink, reward) {
+            // Open task link
+            telegram.openLink(taskLink);
+            
+            // Show timer overlay
+            showToast('Task started! Complete after 10 seconds...', 'info');
+            
+            // Wait 10 seconds then mark as completed
+            setTimeout(() => {
+                completeTask(taskId, reward);
+            }, 10000);
+        }
+
+        function completeTask(taskId, reward) {
+            // Add task to completed tasks
+            if (!currentUser.completedTasks) {
+                currentUser.completedTasks = [];
+            }
+            
+            if (!currentUser.completedTasks.includes(taskId)) {
+                currentUser.completedTasks.push(taskId);
+                
+                // Update Firebase
+                database.ref('users/' + currentUser.id + '/completedTasks').set(currentUser.completedTasks);
+                
+                // Add reward to balance
+                database.ref('users/' + currentUser.id + '/balance').set(
+                    firebase.database.ServerValue.increment(reward)
+                );
+                
+                // Update statistics
+                database.ref('users/' + currentUser.id + '/statistics/tasksCompleted').set(
+                    firebase.database.ServerValue.increment(1)
+                );
+                
+                database.ref('users/' + currentUser.id + '/totalEarned').set(
+                    firebase.database.ServerValue.increment(reward)
+                );
+                
+                showToast(`Task completed! ${reward} BTX added to your balance`, 'success');
+                
+                // Reload tasks
+                loadTasks();
+                updateUserInterface();
+            }
+        }
+
+        function watchAd() {
+            // Load Monetag ad script
+            const script = document.createElement('script');
+            script.src = '//libtl.com/sdk.js';
+            script.setAttribute('data-zone', '10168820');
+            script.setAttribute('data-sdk', 'show_10168820');
+            
+            script.onload = function() {
+                showToast('Ad loaded! Watching now...', 'info');
+                
+                // Simulate ad completion after 30 seconds
+                setTimeout(() => {
+                    completeAd();
+                }, 30000);
+            };
+            
+            script.onerror = function() {
+                showToast('Failed to load ad. Please try again.', 'error');
+            };
+            
+            document.head.appendChild(script);
+        }
+
+        function completeAd() {
+            const reward = 0.10;
+            
+            // Add reward to balance
+            database.ref('users/' + currentUser.id + '/balance').set(
+                firebase.database.ServerValue.increment(reward)
+            );
+            
+            // Update statistics
+            const statsUpdate = {
+                'statistics/adsWatched': firebase.database.ServerValue.increment(1),
+                'statistics/todayWatched': firebase.database.ServerValue.increment(1),
+                'statistics/weekWatched': firebase.database.ServerValue.increment(1),
+                'statistics/lifetimeWatched': firebase.database.ServerValue.increment(1),
+                'totalEarned': firebase.database.ServerValue.increment(reward)
+            };
+            
+            database.ref('users/' + currentUser.id).update(statsUpdate);
+            
+            showToast(`Ad completed! ${reward} BTX added to your balance`, 'success');
+            updateUserInterface();
+        }
+
+        function loadReferrals() {
+            const referralsList = document.getElementById('referralsList');
+            
+            if (!currentUser.referrals || currentUser.referrals.length === 0) {
+                referralsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="empty-title">No Referrals Yet</div>
+                        <div class="empty-description">Start sharing your referral link to earn rewards!</div>
+                    </div>
+                `;
+                
+                document.getElementById('totalReferrals').textContent = '0';
+                document.getElementById('totalCommission').textContent = '0 BTX';
+                return;
+            }
+            
+            referralsList.innerHTML = '';
+            let totalCommission = 0;
+            
+            currentUser.referrals.forEach(referralId => {
+                database.ref('users/' + referralId).once('value').then((snapshot) => {
+                    const referral = snapshot.val();
+                    
+                    if (referral) {
+                        // Calculate commission (20% of referral earnings)
+                        const commission = (referral.totalEarned || 0) * 0.2;
+                        totalCommission += commission;
+                        
+                        const referralElement = createReferralElement(referral, commission);
+                        referralsList.appendChild(referralElement);
+                        
+                        // Update stats
+                        document.getElementById('totalReferrals').textContent = currentUser.referrals.length;
+                        document.getElementById('totalCommission').textContent = totalCommission.toFixed(2) + ' BTX';
+                    }
+                });
+            });
+        }
+
+        function createReferralElement(referral, commission) {
+            const div = document.createElement('div');
+            div.className = 'referral-item';
+            
+            const isActive = new Date() - new Date(referral.lastActive) < 7 * 24 * 60 * 60 * 1000; // Active in last 7 days
+            
+            div.innerHTML = `
+                <img class="referral-avatar" src="${referral.photo_url || 'https://via.placeholder.com/40'}" alt="${referral.name}">
+                <div class="referral-details">
+                    <div class="referral-name">${referral.name}</div>
+                    <div class="referral-status">${isActive ? 'Active' : 'Inactive'}</div>
+                </div>
+                <div class="referral-commission">
+                    ${commission.toFixed(2)} BTX
+                </div>
+            `;
+            
+            return div;
+        }
+
+        function loadLeaderboard() {
+            const leaderboardList = document.getElementById('leaderboardList');
+            leaderboardList.innerHTML = '<div style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i></div>';
+            
+            // Load top referrers in last 24 hours
+            const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+            
+            database.ref('users').orderByChild('referrals').limitToLast(20).once('value').then((snapshot) => {
+                const users = snapshot.val();
+                leaderboardList.innerHTML = '';
+                
+                if (users) {
+                    // Convert to array and sort by referral count
+                    const usersArray = Object.keys(users).map(userId => ({
+                        id: userId,
+                        ...users[userId]
+                    })).filter(user => user.referrals && user.referrals.length > 0)
+                      .sort((a, b) => b.referrals.length - a.referrals.length)
+                      .slice(0, 10);
+                    
+                    usersArray.forEach((user, index) => {
+                        const leaderboardElement = createLeaderboardElement(user, index + 1);
+                        leaderboardList.appendChild(leaderboardElement);
+                    });
+                } else {
+                    leaderboardList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="empty-title">No Referrers Yet</div>
+                            <div class="empty-description">Leaderboard will update daily</div>
+                        </div>
+                    `;
+                }
+            }).catch((error) => {
+                console.error('Error loading leaderboard:', error);
+            });
+        }
+
+        function createLeaderboardElement(user, rank) {
+            const div = document.createElement('div');
+            div.className = 'leaderboard-item';
+            
+            let rankClass = '';
+            let rankIcon = rank;
+            
+            if (rank === 1) {
+                rankClass = 'gold';
+                rankIcon = '🥇';
+            } else if (rank === 2) {
+                rankClass = 'silver';
+                rankIcon = '🥈';
+            } else if (rank === 3) {
+                rankClass = 'bronze';
+                rankIcon = '🥉';
+            }
+            
+            div.innerHTML = `
+                <div class="leaderboard-rank ${rankClass}">${rankIcon}</div>
+                <div class="leaderboard-info">
+                    <div class="leaderboard-name">${user.name}</div>
+                    <div class="leaderboard-referrals">${user.referrals.length} referrals</div>
+                </div>
+                <div class="leaderboard-earnings">
+                    ${(user.totalEarned || 0).toFixed(2)} BTX
+                </div>
+            `;
+            
+            return div;
+        }
+
+        function copyReferralLink() {
+            const referralLink = document.getElementById('referralLink');
+            referralLink.select();
+            document.execCommand('copy');
+            showToast('Referral link copied to clipboard!', 'success');
+        }
+
+        function copyUserId() {
+            navigator.clipboard.writeText(currentUser.id.toString()).then(() => {
+                showToast('User ID copied to clipboard!', 'success');
+            });
+        }
+
+        function toggleSound() {
+            userSettings.sound = !userSettings.sound;
+            document.getElementById('soundToggle').classList.toggle('active', userSettings.sound);
+            
+            // Save to Firebase
+            database.ref('users/' + currentUser.id + '/settings').set(userSettings);
+            
+            showToast(userSettings.sound ? 'Sound enabled' : 'Sound disabled', 'info');
+        }
+
+        function toggleNotifications() {
+            userSettings.notifications = !userSettings.notifications;
+            document.getElementById('notificationToggle').classList.toggle('active', userSettings.notifications);
+            
+            // Save to Firebase
+            database.ref('users/' + currentUser.id + '/settings').set(userSettings);
+            
+            // Request notification permission if enabling
+            if (userSettings.notifications && 'Notification' in window) {
+                Notification.requestPermission();
+            }
+            
+            showToast(userSettings.notifications ? 'Notifications enabled' : 'Notifications disabled', 'info');
+        }
+
+        function toggleTheme() {
+            userSettings.darkMode = !userSettings.darkMode;
+            document.body.classList.toggle('dark-mode', userSettings.darkMode);
+            document.getElementById('themeToggle').classList.toggle('active', userSettings.darkMode);
+            
+            // Save to Firebase
+            database.ref('users/' + currentUser.id + '/settings').set(userSettings);
+            
+            showToast(userSettings.darkMode ? 'Dark mode enabled' : 'Light mode enabled', 'info');
+        }
+
+        function viewTonWallet() {
+            if (currentUser.walletConnected) {
+                showToast(`Connected: ${currentUser.walletAddress.slice(0, 6)}...${currentUser.walletAddress.slice(-4)}`, 'info');
+            } else {
+                showToast('No wallet connected', 'warning');
+            }
+        }
+
+        function showAccountSettings() {
+            showToast('Account settings coming soon!', 'info');
+        }
+
+        function deleteAccount() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                if (confirm('This will permanently delete all your data. Are you absolutely sure?')) {
+                    // Delete user data from Firebase
+                    database.ref('users/' + currentUser.id).remove().then(() => {
+                        showToast('Account deleted successfully', 'success');
+                        setTimeout(() => {
+                            telegram.close();
+                        }, 2000);
+                    }).catch((error) => {
+                        console.error('Error deleting account:', error);
+                        showToast('Failed to delete account', 'error');
+                    });
+                }
+            }
+        }
+
+        function checkDailyCheckin() {
+            const today = new Date().toDateString();
+            const lastCheckin = currentUser.lastCheckin ? new Date(currentUser.lastCheckin).toDateString() : null;
+            
+            if (today !== lastCheckin) {
+                showCheckinModal();
+            }
+        }
+
+        function showCheckinModal() {
+            const modal = document.getElementById('checkinModal');
+            const progressContainer = document.getElementById('checkinProgress');
+            const rewardDiv = document.getElementById('checkinReward');
+            
+            // Calculate current streak
+            let currentDay = 1;
+            if (currentUser.lastCheckin) {
+                const lastCheckin = new Date(currentUser.lastCheckin);
+                const today = new Date();
+                const daysDiff = Math.floor((today - lastCheckin) / (1000 * 60 * 60 * 24));
+                
+                if (daysDiff === 1) {
+                    currentDay = (currentUser.checkinStreak || 0) + 1;
+                    if (currentDay > 7) currentDay = 1;
+                }
+            }
+            
+            // Generate progress days
+            progressContainer.innerHTML = '';
+            for (let i = 1; i <= 7; i++) {
+                const dayItem = document.createElement('div');
+                dayItem.className = 'day-item';
+                
+                let circleClass = 'pending';
+                if (i < currentDay) {
+                    circleClass = 'completed';
+                } else if (i === currentDay) {
+                    circleClass = 'current';
+                }
+                
+                dayItem.innerHTML = `
+                    <div class="day-circle ${circleClass}">${i}</div>
+                    <div class="day-label">Day ${i}</div>
+                `;
+                
+                progressContainer.appendChild(dayItem);
+            }
+            
+            // Show reward
+            rewardDiv.innerHTML = `
+                <i class="fas fa-gift"></i>
+                Today's Reward: ${currentDay} BTX
+            `;
+            
+            // Store current day for claiming
+            window.currentCheckinDay = currentDay;
+            
+            modal.classList.add('active');
+        }
+
+        function closeCheckinModal() {
+            document.getElementById('checkinModal').classList.remove('active');
+        }
+
+        function claimCheckinReward() {
+            const reward = window.currentCheckinDay || 1;
+            
+            // Update user data
+            const updates = {
+                lastCheckin: new Date().toISOString(),
+                checkinStreak: reward,
+                balance: firebase.database.ServerValue.increment(reward),
+                totalEarned: firebase.database.ServerValue.increment(reward)
+            };
+            
+            database.ref('users/' + currentUser.id).update(updates).then(() => {
+                currentUser.lastCheckin = new Date().toISOString();
+                currentUser.checkinStreak = reward;
+                currentUser.balance += reward;
+                currentUser.totalEarned += reward;
+                
+                updateUserInterface();
+                closeCheckinModal();
+                
+                showToast(`Daily check-in claimed! ${reward} BTX added to your balance`, 'success');
+                
+                // Send bot notification for milestone
+                if (reward === 7) {
+                    sendBotNotification(`${currentUser.name} completed a 7-day check-in streak!`);
+                }
+            }).catch((error) => {
+                console.error('Error claiming check-in:', error);
+                showToast('Failed to claim reward', 'error');
+            });
+        }
+
+        function updateStats() {
+            // Update user statistics in real-time
+            database.ref('users/' + currentUser.id).on('value', (snapshot) => {
+                const userData = snapshot.val();
+                if (userData) {
+                    currentUser = userData;
+                    updateUserInterface();
+                }
+            });
+        }
+
+        function sendBotNotification(message) {
+            // Send notification to Telegram bot
+            const botToken = '8205391931:AAFs5FnMbr96RpZ8DLJEDyKpgZzCmHaqszw';
+            const chatId = 'YOUR_CHAT_ID'; // This should be your admin chat ID
+            
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message,
+                    parse_mode: 'HTML'
+                })
+            }).catch((error) => {
+                console.error('Error sending bot notification:', error);
+            });
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            
+            if (seconds < 60) return 'just now';
+            if (seconds < 3600) return Math.floor(seconds / 60) + ' minutes ago';
+            if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ago';
+            if (seconds < 2592000) return Math.floor(seconds / 86400) + ' days ago';
+            
+            return date.toLocaleDateString();
+        }
+
+        // Handle online/offline status
+        window.addEventListener('online', () => {
+            showToast('Connection restored', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            showToast('Connection lost', 'warning');
+        });
+
+        // Handle visibility change
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                // App came back to foreground, refresh data
+                updateStats();
+            }
+        });
+
+        // Prevent zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (event) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
 </body>
 </html>
